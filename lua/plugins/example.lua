@@ -108,7 +108,6 @@ return {
         -- Specify * to use this function as a fallback for any server
         -- ["*"] = function(server, opts) end,
       },
-      inlay_hints = { enabled = false },
     },
   },
 
