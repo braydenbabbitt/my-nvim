@@ -19,16 +19,5 @@ return {
         winblend = 0,
       },
     },
-    config = function()
-      require("telescope").setup({
-        pickers = {
-          buffers = {
-            initial_mode = "normal",
-          },
-        },
-      })
-
-      vim.cmd("colorscheme tokyonight")
-    end,
   },
 }
