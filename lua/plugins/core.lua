@@ -4,19 +4,6 @@ return {
     lazy = false,
     priority = 1000,
     opts = {},
-    -- config = function()
-    --   require("tokyonight").setup({
-    --     style = "night",
-    --     styles = {
-    --       functions = {},
-    --     },
-    --     on_colors = function(colors)
-    --       colors.error = "#eb1717"
-    --     end,
-    --   })
-    --
-    --   vim.cmd("colorscheme tokyonight")
-    -- end,
   },
   {
     "nvim-lspconfig",
@@ -46,13 +33,14 @@ return {
         style = "dark",
         color_overrides = {
           vscBack = "#0f1012",
+          vscPopupBack = "#0f1012",
         },
         group_overrides = {
           Cursor = { fg = c.vscDarkBlue, bg = c.vscLightGreen, bold = true },
           CursorLineNr = { fg = c.vscUiOrange, bg = "NONE" },
-          NvimTreeGitDirty = { fg = c.vscDarkYellow, bg = "NONE" },
         },
       })
+      vim.api.nvim_set_hl(0, "NeoTreeGitModified", { fg = c.vscDarkYellow, bg = "NONE" })
 
       vim.cmd("colorscheme vscode")
     end,
