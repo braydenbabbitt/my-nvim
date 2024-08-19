@@ -3,6 +3,9 @@ return {
   config = function(opts)
     local c = require("vscode.colors").get_colors()
     require("neo-tree").setup({
+      buffers = {
+        bind_to_cwd = false,
+      },
       filesystem = {
         filtered_items = {
           visible = true,

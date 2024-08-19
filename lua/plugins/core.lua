@@ -45,4 +45,9 @@ return {
       vim.cmd("colorscheme vscode")
     end,
   },
+  {
+    "olimorris/onedarkpro.nvim",
+    lazy = false,
+    priority = 1000,
+  },
 }
