@@ -12,6 +12,14 @@ return {
           leave_dirs_open = false,
         },
       },
+      event_handlers = {
+        {
+          event = "file_open_requested",
+          handler = function()
+            require("neo-tree.command").execute({ action = "close" })
+          end,
+        },
+      },
     })
 
     vim.api.nvim_set_hl(0, "NeoTreeGitModified", { fg = c.vscDarkYellow, bg = "NONE" })
