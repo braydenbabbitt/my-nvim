@@ -3,5 +3,6 @@
 -- Add any additional keymaps here
 vim.keymap.set("n", "<C-`>", function()
   LazyVim.terminal()
-end, { desc = "Toggle Root Dir Terminal" })
-vim.keymap.set("t", "<C-`>", "<cmd>close<cr>", { desc = "Hide Terminal" })
+end, { desc = "Toggle Root Dir Terminal", remap = true })
+vim.keymap.set("t", "<C-`>", "<cmd>close<cr>", { desc = "Hide Terminal", remap = true })
+vim.keymap.set("n", "<leader>/", "<leader>sG", { desc = "Grep (cwd)", remap = true })
