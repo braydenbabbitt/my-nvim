@@ -6,3 +6,6 @@ vim.keymap.set("n", "<C-`>", function()
 end, { desc = "Toggle Root Dir Terminal", remap = true })
 vim.keymap.set("t", "<C-`>", "<cmd>close<cr>", { desc = "Hide Terminal", remap = true })
 vim.keymap.set("n", "<leader>/", "<leader>sG", { desc = "Grep (cwd)", remap = true })
+
+-- Black hole register for 'x' deletion
+vim.keymap.set("n", "x", '"_x')
