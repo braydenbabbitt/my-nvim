@@ -14,6 +14,7 @@ return {
         window = {
           width = 0.4,
         },
+        model = "o1-preview",
         mappings = {
           -- Use tab for completion
           complete = {
