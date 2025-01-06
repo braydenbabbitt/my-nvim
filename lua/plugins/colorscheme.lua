@@ -35,13 +35,17 @@ return {
         },
       })
       vim.api.nvim_set_hl(0, "NeoTreeGitModified", { fg = c.vscDarkYellow, bg = "NONE" })
-
-      vim.cmd("colorscheme vscode")
     end,
   },
   {
     "olimorris/onedarkpro.nvim",
     lazy = false,
     priority = 1000,
+  },
+  {
+    "LazyVim/LazyVim",
+    opts = {
+      colorscheme = "vscode",
+    },
   },
 }
