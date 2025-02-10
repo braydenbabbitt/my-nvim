@@ -33,3 +33,6 @@ end, { desc = "Reset Windows and Buffers", remap = true })
 
 -- Go to definition with leader
 vim.keymap.set("n", "<leader>gd", "gd", { desc = "Go to Definition", remap = true })
+
+-- Use safer "esc" when attempting to exit insert mode
+vim.keymap.set("i", "<C-c>", "<esc>")
