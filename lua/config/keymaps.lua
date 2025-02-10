@@ -20,3 +20,16 @@ vim.keymap.set("n", "G", "G$")
 vim.keymap.set("n", "gg", "gg0")
 vim.keymap.set("v", "G", "G$")
 vim.keymap.set("v", "gg", "gg0")
+
+-- Reset windows and buffers
+vim.keymap.set("n", "<leader>R", function()
+  vim.cmd("bufdo bwipeout")
+  vim.cmd("only")
+end, { desc = "Reset Windows and Buffers", remap = true })
+vim.keymap.set("v", "<leader>R", function()
+  vim.cmd("bufdo bwipeout")
+  vim.cmd("only")
+end, { desc = "Reset Windows and Buffers", remap = true })
+
+-- Go to definition with leader
+vim.keymap.set("n", "<leader>gd", "gd", { desc = "Go to Definition", remap = true })
