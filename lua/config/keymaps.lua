@@ -8,7 +8,8 @@ vim.keymap.set("t", "<C-`>", "<cmd>close<cr>", { desc = "Hide Terminal", remap =
 vim.keymap.set("n", "<leader>/", "<leader>sG", { desc = "Grep (cwd)", remap = true })
 
 -- Black hole register for 'x' deletion
-vim.keymap.set("n", "x", '"_x')
+vim.keymap.set("n", "x", '"_x', { noremap = true, silent = true })
+vim.keymap.set("v", "x", '"_x', { noremap = true, silent = true })
 
 -- Custom LSP keymaps
 vim.keymap.del("n", "<leader>L")
@@ -16,10 +17,10 @@ vim.keymap.set("n", "<leader>Lr", "<cmd>LspRestart<CR>", { desc = "Restart LSP",
 vim.keymap.set("n", "<leader>Li", "<cmd>LspInfo<CR>", { desc = "LSP Info", remap = true })
 
 -- Beginning and end of file keymaps
-vim.keymap.set("n", "G", "G$")
-vim.keymap.set("n", "gg", "gg0")
-vim.keymap.set("v", "G", "G$")
-vim.keymap.set("v", "gg", "gg0")
+vim.keymap.set("n", "G", "G$", { remap = true })
+vim.keymap.set("n", "gg", "gg0", { remap = true })
+vim.keymap.set("v", "G", "G$", { remap = true })
+vim.keymap.set("v", "gg", "gg0", { remap = true })
 
 -- Reset windows and buffers
 vim.keymap.set("n", "<leader>R", function()
@@ -35,4 +36,4 @@ end, { desc = "Reset Windows and Buffers", remap = true })
 vim.keymap.set("n", "<leader>gd", "gd", { desc = "Go to Definition", remap = true })
 
 -- Use safer "esc" when attempting to exit insert mode
-vim.keymap.set("i", "<C-c>", "<esc>")
+vim.keymap.set("i", "<C-c>", "<esc>", { remap = true })
