@@ -24,12 +24,14 @@ vim.keymap.set("v", "gg", "gg0", { remap = true })
 
 -- Reset windows and buffers
 vim.keymap.set("n", "<leader>R", function()
-  vim.cmd("bufdo bwipeout")
-  vim.cmd("only")
+  vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes("<leader>wo", true, false, true), "n", true)
+  vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes("<leader>bo", true, false, true), "n", true)
+  vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes("<leader>bd", true, false, true), "n", true)
 end, { desc = "Reset Windows and Buffers", remap = true })
 vim.keymap.set("v", "<leader>R", function()
-  vim.cmd("bufdo bwipeout")
-  vim.cmd("only")
+  vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes("<leader>wo", true, false, true), "n", true)
+  vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes("<leader>bo", true, false, true), "n", true)
+  vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes("<leader>bd", true, false, true), "n", true)
 end, { desc = "Reset Windows and Buffers", remap = true })
 
 -- Go to definition with leader
