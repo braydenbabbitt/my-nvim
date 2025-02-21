@@ -25,6 +25,9 @@ vim.keymap.set("v", "gg", "gg0", { remap = true })
 -- Reset windows and buffers
 vim.keymap.set("n", "<leader>R", function()
   Snacks.bufdelete.all()
+  if vim.fn.winnr("$") > 1 then
+    vim.cmd("only")
+  end
   vim.cmd("only")
 end, { desc = "Reset Windows and Buffers", remap = true })
 
