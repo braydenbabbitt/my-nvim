@@ -7,9 +7,11 @@ end, { desc = "Toggle Root Dir Terminal", remap = true })
 vim.keymap.set("t", "<C-`>", "<cmd>close<cr>", { desc = "Hide Terminal", remap = true })
 vim.keymap.set("n", "<leader>/", "<leader>sG", { desc = "Grep (cwd)", remap = true })
 
--- Black hole register for 'x' deletion
-vim.keymap.set("n", "x", '"_x', { noremap = true, silent = true })
-vim.keymap.set("v", "x", '"_x', { noremap = true, silent = true })
+-- Black hole register for Alt modifier key deletion
+vim.keymap.set("n", "<M-x>", '"_x', { noremap = true, silent = true })
+vim.keymap.set("v", "<M-x>", '"_x', { noremap = true, silent = true })
+vim.keymap.set("n", "<M-d>", '"_d', { noremap = true, silent = true })
+vim.keymap.set("v", "<M-d>", '"_x', { noremap = true, silent = true })
 
 -- Custom LSP keymaps
 vim.keymap.del("n", "<leader>L")
