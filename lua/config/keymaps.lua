@@ -30,7 +30,6 @@ vim.keymap.set("n", "<leader>R", function()
   if vim.fn.winnr("$") > 1 then
     vim.cmd("only")
   end
-  vim.cmd("only")
 end, { desc = "Reset Windows and Buffers", remap = true })
 
 -- Go to definition with leader
