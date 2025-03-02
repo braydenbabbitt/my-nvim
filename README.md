@@ -1,4 +1,3 @@
-# 💤 LazyVim
+# Brayden's Neovim Config
 
-A starter template for [LazyVim](https://github.com/LazyVim/LazyVim).
-Refer to the [documentation](https://lazyvim.github.io/installation) to get started.
+This is a WIP custom config started from `kickstart.nvim` to replace my current usage of the LazyVim distro.
