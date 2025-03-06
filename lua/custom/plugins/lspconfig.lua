@@ -133,12 +133,26 @@ return {
       --  So, we create new capabilities with nvim cmp, and then broadcast that to the servers.
       local capabilities = vim.lsp.protocol.make_client_capabilities()
       capabilities = vim.tbl_deep_extend("force", capabilities, require("cmp_nvim_lsp").default_capabilities())
+      local util = require("lspconfig.util")
 
       local servers = {
+        denols = {
+          root_dir = function(fname)
+            return util.root_pattern("deno.json", "deno.jsonc")(fname)
+          end,
+          init_options = {
+            enable = true,
+            lint = true,
+          },
+          filetypes = { "typescript", "javascript", "javascriptreact", "typescriptreact" },
+          single_file_support = false,
+        },
         vtsls = {
           inlay_hints = {
             enabled = false,
           },
+          filetypes = { "typescript", "javascript", "javascriptreact", "typescriptreact" },
+          single_file_support = false,
         },
         lua_ls = {
           settings = {
