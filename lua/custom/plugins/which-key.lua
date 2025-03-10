@@ -52,6 +52,7 @@ return {
         { "<leader>gb", group = "[B]lame operations" },
         { "<leader>d", group = "[D]ocument" },
         { "<leader>l", group = "[L]SP" },
+        { "<leader>S", group = "[S]essions" },
       },
     },
   },

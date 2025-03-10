@@ -20,6 +20,26 @@ return {
           },
         },
       },
+      indent = { enabled = true },
+      input = { enabled = true },
+      notifier = { enabled = true },
+      scope = { enabled = true },
+      scroll = { enabled = true },
+      statuscolumn = { enabled = true },
+      toggle = { map = SafeKeymapSet },
+      words = { enabled = true },
+      bigfile = { enabled = true },
+      quickfile = { enabled = true },
+      terminal = {
+        win = {
+          keys = {
+            nav_h = { "<C-h>", TerminalNav("h"), desc = "Go to Left Window", expr = true, mode = "t" },
+            nav_j = { "<C-j>", TerminalNav("j"), desc = "Go to Lower Window", expr = true, mode = "t" },
+            nav_k = { "<C-k>", TerminalNav("k"), desc = "Go to Upper Window", expr = true, mode = "t" },
+            nav_l = { "<C-l>", TerminalNav("l"), desc = "Go to Right Window", expr = true, mode = "t" },
+          },
+        },
+      },
     },
     keys = {
       {
