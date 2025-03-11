@@ -11,6 +11,98 @@ return {
       -- Allows extra capabilities provided by nvim-cmp
       "hrsh7th/cmp-nvim-lsp",
     },
+    opts = {
+      servers = {
+        eslint = {
+          settings = {
+            workingDirectories = { mode = "auto" },
+            format = true,
+          },
+        },
+      },
+      setup = {
+        eslint = function()
+          local get_clients = function(opts)
+            local ret = {}
+            if vim.lsp.get_clients then
+              ret = vim.lsp.get_clients(opts)
+            else
+              ret = vim.lsp.get_active_clients(opts)
+              if opts and opts.method then
+                ret = vim.tbl_filter(function(client)
+                  return client.supports_method(opts.method, { bufnr = opts.bufnr })
+                end, ret)
+              end
+            end
+            return opts and opts.filter and vim.tbl_filter(opts.filter, ret) or ret
+          end
+
+          local function get_client(buf)
+            return get_clients({ name = "eslint", bufnr = buf })[1]
+          end
+
+          local Plugin = require("lazy.core.plugin")
+          local conform_format = Plugin.values("conform.nvim", "opts", false).format
+
+          local format = function(opts)
+            opts = vim.tbl_deep_extend("force", {}, opts or {}, conform_format)
+          end
+
+          local get_formatter = function(opts)
+            opts = opts or {}
+            local filter = opts.filter or {}
+            filter = type(filter) == "string" and { name = filter } or filter
+
+            local ret = {
+              name = "LSP",
+              primary = true,
+              priority = 1,
+              format = function(buf)
+                format(vim.tbl_deep_extend("force", {}, filter, { bufnr = buf }))
+              end,
+              sources = function(buf)
+                local clients = get_clients(vim.tbl_deep_extend("force", filter, { bufnr = buf }))
+
+                local ret = vim.tbl_filter(function(client)
+                  return client.supports_method("textDocument/formatting")
+                    or client.supports_method("textDocument/rangeFormatting")
+                end, clients)
+
+                return vim.tbl_map(function(client)
+                  return client.name
+                end, ret)
+              end,
+            }
+
+            return vim.tbl_deep_extend("force", ret, opts)
+          end
+
+          local formatter = get_formatter({
+            name = "eslint: lsp",
+            primary = false,
+            priority = 200,
+            filter = "eslint",
+          })
+
+          if not pcall(require, "vim.lsp._dynamic") then
+            formatter.name = "eslint: EslintFixAll"
+            formatter.sources = function(buf)
+              local client = get_client(buf)
+              return client and { "eslint" } or {}
+            end
+            formatter.format = function(buf)
+              local client = get_client(buf)
+              if client then
+                local diag = vim.diagnostic.get(buf, { namespace = vim.lsp.diagnostic.get_namespace(client.id) })
+                if #diag > 0 then
+                  vim.cmd("EslintFixAll")
+                end
+              end
+            end
+          end
+        end,
+      },
+    },
     config = function(opts)
       vim.api.nvim_create_autocmd("LspAttach", {
         group = vim.api.nvim_create_augroup("kickstart-lsp-attach", { clear = true }),
@@ -182,6 +274,8 @@ return {
           end,
         },
       })
+
+      require("nvim-lspconfig").setup(opts)
     end,
   },
 }
