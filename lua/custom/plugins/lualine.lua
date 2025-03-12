@@ -109,7 +109,7 @@ return {
                 hint = icons.diagnostics.Hint,
               },
             },
-            { GetPrettyPath() },
+            { vim.api.nvim_buf_get_name(0) },
           },
           lualine_y = {
             Snacks.profiler.status(),

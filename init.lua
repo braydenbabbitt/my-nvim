@@ -576,3 +576,5 @@ require("lazy").setup({
 
 -- Personal config
 vim.opt.tabstop = 2
+
+vim.g.snacks_animate = false

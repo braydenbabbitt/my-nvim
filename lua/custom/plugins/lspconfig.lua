@@ -275,7 +275,7 @@ return {
         },
       })
 
-      require("nvim-lspconfig").setup(opts)
+      -- require("nvim-lspconfig").setup(opts)
     end,
   },
 }
