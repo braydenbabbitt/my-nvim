@@ -8,10 +8,10 @@ vim.keymap.set("t", "<C-`>", "<cmd>close<cr>", { desc = "Hide Terminal", remap =
 vim.keymap.set("n", "<leader>/", "<leader>sG", { desc = "Grep (cwd)", remap = true })
 
 -- Black hole register for Alt modifier key deletion
-vim.keymap.set("n", "<M-x>", '"_x', { noremap = true, silent = true })
-vim.keymap.set("v", "<M-x>", '"_x', { noremap = true, silent = true })
-vim.keymap.set("n", "<M-d>", '"_d', { noremap = true, silent = true })
-vim.keymap.set("v", "<M-d>", '"_x', { noremap = true, silent = true })
+vim.keymap.set("n", "<leader>x", '"_x', { noremap = true, silent = true })
+vim.keymap.set("v", "<leader>x", '"_x', { noremap = true, silent = true })
+vim.keymap.set("n", "<leader>d", '"_d', { noremap = true, silent = true })
+vim.keymap.set("v", "<leader>d", '"_x', { noremap = true, silent = true })
 
 -- Custom LSP keymaps
 vim.keymap.del("n", "<leader>L")
@@ -45,3 +45,21 @@ vim.keymap.set("i", "<C-c>", function()
     },
   }, true, {})
 end, { noremap = true })
+
+Snacks.toggle.profiler():map("<leader>Dpp")
+Snacks.toggle.profiler_highlights():map("<leader>Dph")
+
+vim.keymap.del("n", "<leader>xl")
+vim.keymap.del("n", "<leader>xq")
+vim.keymap.set("n", "<leader>Xl", function()
+  local success, err = pcall(vim.fn.getloclist(0, { winid = 0 }).winid ~= 0 and vim.cmd.lclose or vim.cmd.lopen)
+  if not success and err then
+    vim.notify(err, vim.log.levels.ERROR)
+  end
+end, { desc = "Location List" })
+vim.keymap.set("n", "<leader>Xq", function()
+  local success, err = pcall(vim.fn.getqflist({ winid = 0 }).winid ~= 0 and vim.cmd.cclose or vim.cmd.copen)
+  if not success and err then
+    vim.notify(err, vim.log.levels.ERROR)
+  end
+end, { desc = "Quickfix List" })
