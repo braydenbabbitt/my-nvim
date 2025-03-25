@@ -40,7 +40,8 @@ vim.keymap.set("i", "<C-c>", function()
   vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes("<C-c>", true, false, true), "n", true)
   vim.api.nvim_echo({
     {
-      "Using <C-c> to exit insert mode should only be used in emergencies.\nConsider using <C-[> or <Esc> to avoid buggy behavior.",
+      -- "Using <C-c> to exit insert mode should only be used in emergencies.\nConsider using <C-[> or <Esc> to avoid buggy behavior.",
+      "Using <C-c> to exit insert mode should only be used in emergencies.\nUse the custom <C-Space> remap instead to avoid buggy behavior",
       "WarningMsg",
     },
   }, true, {})
@@ -63,3 +64,11 @@ vim.keymap.set("n", "<leader>Xq", function()
     vim.notify(err, vim.log.levels.ERROR)
   end
 end, { desc = "Quickfix List" })
+
+-- Use Ctrl+space instead of ESC or Ctrl+[ to save my wrist
+vim.keymap.set("v", "<C-space>", "<Esc>", { noremap = true })
+vim.keymap.set("v", "<C-@>", "<Esc>", { noremap = true })
+
+-- This currently has a conflict with blink.lua config from LazyVim. See plugins/blink.lua to see how we're dealing with that
+-- vim.keymap.set("i", "<C-space>", "<Esc>", { noremap = true })
+-- vim.keymap.set("i", "<C-@>", "<Esc>", { noremap = true })
