@@ -4,6 +4,11 @@ return {
     opts = {
       keymap = {
         preset = "super-tab",
+        ["<C-space>"] = {
+          function()
+            vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes("<Esc>", true, false, true), "n", false)
+          end,
+        },
       },
     },
   },
