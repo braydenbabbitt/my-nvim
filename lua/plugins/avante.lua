@@ -35,6 +35,7 @@ return {
         auto_suggestions = false, -- Disable this to avoid copilot account suspension until avante fixes the issue
       },
     },
+    -- In order to get Avante to work, run :AvanteBuild
     build = vim.fn.has("win32") == 1 and "powershell -ExecutionPolicy Bypass -File Build.ps1 -BuildFromSource false"
       or "make",
     dependencies = {
