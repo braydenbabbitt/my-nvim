@@ -18,5 +18,16 @@ return {
         },
       },
     },
+    keys = {
+      { "<leader>aa", false },
+      {
+        "<leader>aA",
+        function()
+          return require("CopilotChat").toggle()
+        end,
+        desc = "Toggle (CopilotChat)",
+        mode = { "n", "v" },
+      },
+    },
   },
 }
