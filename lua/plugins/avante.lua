@@ -28,7 +28,7 @@ return {
           prev = "<up>",
         },
         files = {
-          add_current = avante_prefix .. "fa",
+          add_current = avante_prefix .. "F",
         },
       },
       behaviour = {
