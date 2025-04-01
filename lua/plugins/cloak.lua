@@ -12,6 +12,10 @@ return {
           file_pattern = "*",
           cloak_pattern = { "brayden%S*(?:babbitt%S*)?" },
         },
+        {
+          file_pattern = ".env*",
+          cloak_pattern = { "=.+" },
+        },
       },
     },
   },
