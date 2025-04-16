@@ -18,8 +18,15 @@ return {
           single_file_support = false,
         },
         vtsls = {
+          root_dir = function(fname)
+            return util.root_pattern("package.json")(fname)
+          end,
           filetypes = { "typescript", "javascript", "javascriptreact", "typescriptreact" },
           single_file_support = false,
+        },
+        postgres_lsp = {
+          filetypes = { "sql" },
+          single_file_support = true,
         },
       },
     },
