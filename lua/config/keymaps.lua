@@ -72,3 +72,6 @@ vim.keymap.set("v", "<C-@>", "<Esc>", { noremap = true })
 -- This currently has a conflict with blink.lua config from LazyVim. See plugins/blink.lua to see how we're dealing with that
 -- vim.keymap.set("i", "<C-space>", "<Esc>", { noremap = true })
 -- vim.keymap.set("i", "<C-@>", "<Esc>", { noremap = true })
+
+vim.keymap.set("n", "<leader>ac", "<cmd>AvanteClear<CR>", { desc = "Clear Avante Chat" })
+vim.keymap.set("v", "<leader>ac", "<cmd>AvanteClear<CR>", { desc = "Clear Avante Chat" })
