@@ -32,8 +32,38 @@ vim.keymap.set("n", "<leader>R", function()
   end
 end, { desc = "Reset Windows and Buffers", remap = true })
 
--- Go to definition with leader
-vim.keymap.set("n", "<leader>gd", "gd", { desc = "Go to Definition", remap = true })
+-- Go to definition with leader (opens in new buffer)
+vim.keymap.set("n", "<leader>gD", "gd", { desc = "Go to Definition (new buffer)", remap = true })
+-- Go to definition replacing the current buffer
+vim.keymap.set("n", "<leader>gd", function()
+  -- Save current window ID
+  local current_win = vim.api.nvim_get_current_win()
+  -- Save current buffer ID
+  local current_buf = vim.api.nvim_get_current_buf()
+  -- Get current cursor position
+  local cursor_pos = vim.api.nvim_win_get_cursor(current_win)
+
+  -- Store information about the current buffer to allow returning
+  vim.w.previous_buffer = {
+    bufnr = current_buf,
+    cursor = cursor_pos,
+  }
+
+  -- Create a command to close the current buffer after we jump
+  vim.cmd("augroup GotoDefinitionReplaceBuf")
+  vim.cmd("autocmd!")
+  vim.cmd(
+    "autocmd BufWinEnter * ++once lua if vim.api.nvim_get_current_buf() ~= "
+      .. current_buf
+      .. " then vim.api.nvim_buf_delete("
+      .. current_buf
+      .. ", {force = true}) vim.cmd('autocmd! GotoDefinitionReplaceBuf') vim.cmd('augroup! GotoDefinitionReplaceBuf') end"
+  )
+  vim.cmd("augroup END")
+
+  -- Use LSP to jump to definition
+  vim.lsp.buf.definition()
+end, { desc = "Go to Definition (replace buffer)", noremap = true })
 
 -- Ctrl-c to safer keys message/alert
 vim.keymap.set("i", "<C-c>", function()
