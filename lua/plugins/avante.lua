@@ -9,7 +9,7 @@ return {
       provider = "copilot",
       providers = {
         copilot = {
-          model = "claude-3.7-sonnet",
+          model = "claude-sonnet-4",
         },
       },
       mappings = {
