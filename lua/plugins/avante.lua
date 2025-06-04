@@ -7,8 +7,10 @@ return {
     lazy = true,
     opts = {
       provider = "copilot",
-      copilot = {
-        model = "claude-3.7-sonnet",
+      providers = {
+        copilot = {
+          model = "claude-3.7-sonnet",
+        },
       },
       mappings = {
         ask = avante_prefix .. "a",
@@ -34,9 +36,13 @@ return {
         auto_suggestions = false, -- Disable this to avoid copilot account suspension until avante fixes the issue
       },
     },
-    -- In order to get Avante to work, run :AvanteBuild
+    -- Build command for initial plugin installation
     build = vim.fn.has("win32") == 1 and "powershell -ExecutionPolicy Bypass -File Build.ps1 -BuildFromSource false"
       or "make",
+    config = function(_, opts)
+      require("avante").setup(opts)
+      vim.cmd("AvanteBuild")
+    end,
     dependencies = {
       "nvim-lua/plenary.nvim",
       "MunifTanjim/nui.nvim",
