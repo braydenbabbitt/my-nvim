@@ -13,14 +13,14 @@ return {
         },
       },
       mappings = {
-        ask = avante_prefix .. "a",
+        ask = avante_prefix .. "A", -- Changed from "a" to "A" to make room for custom mapping
         edit = avante_prefix .. "e",
         refresh = avante_prefix .. "r",
         focus = avante_prefix .. "f",
         toggle = {
           default = avante_prefix .. "t",
           debug = avante_prefix .. "d",
-          hint = avante_prefix .. "h",
+          hint = avante_prefix .. "H",
           suggestion = avante_prefix .. "s",
           repomap = avante_prefix .. "R",
         },
@@ -31,6 +31,7 @@ return {
         files = {
           add_current = avante_prefix .. "F",
         },
+        history = avante_prefix .. "h",
       },
       behaviour = {
         auto_suggestions = false, -- Disable this to avoid copilot account suspension until avante fixes the issue
@@ -42,10 +43,16 @@ return {
     config = function(_, opts)
       require("avante").setup(opts)
       vim.cmd("AvanteBuild")
+
+      -- Custom keymap for <leader>aa to create new chat and ask
+      vim.keymap.set("n", "<leader>aa", function()
+        vim.cmd("AvanteChatNew")
+        vim.cmd("AvanteToggle")
+        vim.cmd("AvanteAsk")
+      end, { desc = "Avante: New chat and ask" })
     end,
     dependencies = {
       "nvim-lua/plenary.nvim",
-      "MunifTanjim/nui.nvim",
       {
         "HakonHarnes/img-clip.nvim",
         event = "VeryLazy",
