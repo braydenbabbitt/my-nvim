@@ -15,7 +15,7 @@ return {
             lint = true,
           },
           filetypes = { "typescript", "javascript", "javascriptreact", "typescriptreact" },
-          single_file_support = true,
+          single_file_support = false,
         },
         vtsls = {
           root_dir = function(fname)
