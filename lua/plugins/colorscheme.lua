@@ -8,6 +8,9 @@ return {
       styles = {
         keywords = { italic = false },
       },
+      on_colors = function(colors)
+        colors.bg = "#1c1e28"
+      end,
       dim_inactive = true,
     },
   },
