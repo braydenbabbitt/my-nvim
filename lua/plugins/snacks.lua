@@ -7,6 +7,8 @@ return {
           explorer = {
             auto_close = true,
             git_status_open = false,
+            hidden = true,
+            ignored = true,
           },
         },
       },
