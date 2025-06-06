@@ -2,12 +2,6 @@
 -- Default keymaps that are always set: https://github.com/LazyVim/LazyVim/blob/main/lua/lazyvim/config/keymaps.lua
 -- Add any additional keymaps here
 
--- Black hole register for delete keys with leader
-vim.keymap.set("n", "<leader>x", '"_x', { noremap = true, silent = true })
-vim.keymap.set("v", "<leader>x", '"_x', { noremap = true, silent = true })
-vim.keymap.set("n", "<leader>d", '"_d', { noremap = true, silent = true })
-vim.keymap.set("v", "<leader>d", '"_d', { noremap = true, silent = true })
-
 -- Custom LSP keymaps
 vim.keymap.del("n", "<leader>L")
 vim.keymap.set("n", "<leader>Lr", "<cmd>LspRestart<CR>", { desc = "Restart LSP", remap = true })
