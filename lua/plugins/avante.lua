@@ -53,6 +53,7 @@ return {
     end,
     dependencies = {
       "nvim-lua/plenary.nvim",
+      "stevearc/dressing.nvim",
       {
         "HakonHarnes/img-clip.nvim",
         event = "VeryLazy",
