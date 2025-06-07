@@ -4,7 +4,23 @@
 
 -- Custom LSP keymaps
 vim.keymap.del("n", "<leader>L")
-vim.keymap.set("n", "<leader>Lr", "<cmd>LspRestart<CR>", { desc = "Restart LSP", remap = true })
+vim.keymap.set("n", "<leader>Lr", function()
+  local clients = vim.lsp.get_clients()
+  local client_names = {}
+
+  -- Collect client names before stopping them
+  for _, client in pairs(clients) do
+    table.insert(client_names, client.name)
+    vim.lsp.stop_client(client.id)
+  end
+
+  -- Restart each client by name
+  vim.defer_fn(function()
+    for _, name in pairs(client_names) do
+      vim.cmd("LspStart " .. name)
+    end
+  end, 500)
+end, { desc = "Restart LSP", remap = true })
 vim.keymap.set("n", "<leader>Li", "<cmd>LspInfo<CR>", { desc = "LSP Info", remap = true })
 
 -- Beginning and end of file keymaps
