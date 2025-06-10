@@ -32,6 +32,31 @@ return {
       },
     },
   },
+  {
+    "catppuccin/nvim",
+    -- name = "catppuccin",
+    lazy = false,
+    priority = 1000,
+    opts = {
+      flavour = "mocha",
+      terminal_colors = true,
+      styles = {
+        conditionals = {},
+      },
+      dim_inactive = {
+        enabled = true,
+        shade = "dark",
+        percentage = 0.15,
+      },
+      color_overrides = {
+        mocha = {
+          base = "#11111c",
+          mantle = "#0a0a13",
+          crust = "#040408",
+        },
+      },
+    },
+  },
   -- Apply the selected colorscheme
   {
     "LazyVim/LazyVim",
