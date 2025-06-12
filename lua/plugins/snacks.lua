@@ -26,6 +26,12 @@ return {
         desc = "Explorer Snacks (root dir)",
         remap = true,
       },
+      {
+        "<leader>/",
+        "<leader>sG",
+        desc = "Snacks Search (cwd)",
+        remap = true,
+      },
     },
   },
 }
