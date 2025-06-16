@@ -3,3 +3,8 @@
 -- Add any additional options here
 
 vim.g.snacks_animate = false
+
+-- Global setting to use root directory as current working directory
+vim.g.use_root_dir_as_cwd = true
+
+

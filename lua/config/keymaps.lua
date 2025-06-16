@@ -60,3 +60,8 @@ end, { desc = "Quickfix List" })
 -- Avante keymaps
 vim.keymap.set("n", "<leader>ac", "<cmd>AvanteClear<CR>", { desc = "Clear Avante Chat" })
 vim.keymap.set("v", "<leader>ac", "<cmd>AvanteClear<CR>", { desc = "Clear Avante Chat" })
+
+-- Toggle Use Root Dir as CWD setting
+vim.keymap.set("n", "<leader>uR", function()
+  require("config.utils").toggle_use_root_dir_as_cwd()
+end, { desc = "Toggle Use Root Dir as CWD" })
