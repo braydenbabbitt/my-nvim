@@ -10,7 +10,7 @@ return {
       provider = "copilot",
       providers = {
         copilot = {
-          model = "claude-sonnet-4",
+          model = "gpt-4.1",
         },
       },
       mappings = {
@@ -47,6 +47,11 @@ return {
 
       -- Custom keymap for <leader>aa to create new chat and ask
       vim.keymap.set("n", "<leader>aa", function()
+        vim.cmd("AvanteChatNew")
+        vim.cmd("AvanteToggle")
+        vim.cmd("AvanteAsk")
+      end, { desc = "Avante: New chat and ask" })
+      vim.keymap.set("v", "<leader>aa", function()
         vim.cmd("AvanteChatNew")
         vim.cmd("AvanteToggle")
         vim.cmd("AvanteAsk")

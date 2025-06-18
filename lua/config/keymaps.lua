@@ -4,7 +4,10 @@
 
 -- Custom LSP keymaps
 vim.keymap.del("n", "<leader>L")
-vim.keymap.set("n", "<leader>Lrt", "<cmd>LspRestart vtsls<CR>", { desc = "Restart LSP (TS/vtsls)", remap = true })
+vim.keymap.set("n", "<leader>Lrt", function()
+  vim.cmd("LspRestart vtsls")
+  vim.cmd("LspRestart eslint")
+end, { desc = "Restart LSP (vtsls & eslint)", remap = true })
 vim.keymap.set("n", "<leader>Li", "<cmd>LspInfo<CR>", { desc = "LSP Info", remap = true })
 
 -- Beginning and end of file keymaps
