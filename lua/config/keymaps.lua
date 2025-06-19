@@ -64,3 +64,11 @@ end, { desc = "Quickfix List" })
 vim.keymap.set("n", "<leader>ac", "<cmd>AvanteClear<CR>", { desc = "Clear Avante Chat" })
 vim.keymap.set("v", "<leader>ac", "<cmd>AvanteClear<CR>", { desc = "Clear Avante Chat" })
 
+-- Root dir to cwd keymap overrides
+vim.keymap.set("n", "<C-/", "<leader>fT", { desc = "Terminal (CWD)", remap = true })
+vim.keymap.set("n", "<leader>gG", function()
+  Snacks.lazygit({ cwd = LazyVim.root.git() })
+end, { desc = "Lazygit (Root Dir)" })
+vim.keymap.set("n", "<leader>gg", function()
+  Snacks.lazygit()
+end, { desc = "Lazygit (cwd)" })
