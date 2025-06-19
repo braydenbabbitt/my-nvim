@@ -9,26 +9,26 @@ local _original_lazyvim_root_cwd = nil
 -- If use_root_dir_as_cwd is true, returns the root directory
 -- Otherwise returns the current working directory
 function M.get_cwd()
-  if vim.g.use_root_dir_as_cwd then
-    return LazyVim.root.get()
-  else
+  if vim.g.always_use_cwd then
     return vim.fn.getcwd()
+  else
+    return LazyVim.root.get()
   end
 end
 
 -- Toggle the use_root_dir_as_cwd setting
-function M.toggle_use_root_dir_as_cwd()
-  vim.g.use_root_dir_as_cwd = not vim.g.use_root_dir_as_cwd
-  local status = vim.g.use_root_dir_as_cwd and "enabled" or "disabled"
-  vim.notify("Use Root Dir as CWD: " .. status, vim.log.levels.INFO)
+function M.toggle_always_use_cwd()
+  vim.g.always_use_cwd = not vim.g.always_use_cwd
+  local status = vim.g.always_use_cwd and "enabled" or "disabled"
+  vim.notify("Always use CWD instead of Root Dir set to: " .. status, vim.log.levels.INFO)
 
   -- Apply the override after toggling
   M.apply_root_override()
 end
 
 -- Get the status of the use_root_dir_as_cwd setting
-function M.get_use_root_dir_as_cwd_status()
-  return vim.g.use_root_dir_as_cwd and "Root Dir" or "CWD"
+function M.get_always_user_cwd_status()
+  return vim.g.always_use_cwd and "Always Use CWD" or "Normal Root Dir Behavior"
 end
 
 -- Override LazyVim's root detection to respect our global setting
@@ -44,17 +44,17 @@ function M.apply_root_override()
 
       -- Override LazyVim.root.cwd function
       LazyVim.root.cwd = function()
-        if vim.g.use_root_dir_as_cwd then
-          return _original_lazyvim_root_get()
-        else
+        if vim.g.always_use_cwd then
           return vim.fn.getcwd()
+        else
+          return _original_lazyvim_root_get()
         end
       end
 
       -- Override any getcwd calls within LazyVim plugins when our setting is enabled
       local original_getcwd = vim.fn.getcwd
       vim.fn.getcwd = function(...)
-        if vim.g.use_root_dir_as_cwd then
+        if not vim.g.always_use_cwd then
           -- Check if we're being called from a LazyVim context
           local info = debug.getinfo(2, "S")
           if

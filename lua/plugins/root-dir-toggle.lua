@@ -9,15 +9,14 @@ return {
 
       -- Create a user command to toggle the setting
       vim.api.nvim_create_user_command("ToggleRootDirAsCwd", function()
-        utils.toggle_use_root_dir_as_cwd()
-      end, { desc = "Toggle Use Root Dir as CWD setting" })
+        utils.toggle_always_use_cwd()
+      end, { desc = "Toggle always use CWD" })
 
       -- Create a user command to show the current status
       vim.api.nvim_create_user_command("RootDirAsCwdStatus", function()
-        local status = utils.get_use_root_dir_as_cwd_status()
+        local status = utils.get_always_user_cwd_status()
         vim.notify("Current directory mode: " .. status, vim.log.levels.INFO)
-      end, { desc = "Show current Root Dir as CWD status" })
+      end, { desc = "Show current Root Dir behavior" })
     end,
   },
 }
-

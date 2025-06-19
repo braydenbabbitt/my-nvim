@@ -4,7 +4,5 @@
 
 vim.g.snacks_animate = false
 
--- Global setting to use root directory as current working directory
-vim.g.use_root_dir_as_cwd = true
-
-
+-- Global setting to use cwd instead of root_dir
+vim.g.always_use_cwd = true
