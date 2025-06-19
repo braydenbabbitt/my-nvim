@@ -3,6 +3,3 @@
 -- Add any additional options here
 
 vim.g.snacks_animate = false
-
--- Global setting to use cwd instead of root_dir
-vim.g.always_use_cwd = true
