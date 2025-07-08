@@ -5,12 +5,12 @@ return {
     "yetone/avante.nvim",
     event = "VeryLazy",
     lazy = true,
-    version = "0.0.24",
+    version = "0.0.25",
     opts = {
       provider = "copilot",
       providers = {
         copilot = {
-          model = "gpt-4.1",
+          model = "claude-sonnet-4",
         },
       },
       mappings = {
