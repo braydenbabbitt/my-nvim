@@ -5,7 +5,7 @@ return {
     "yetone/avante.nvim",
     event = "VeryLazy",
     lazy = true,
-    commit = "bd69ae",
+    commit = "5a4ed4a",
     opts = {
       provider = "copilot",
       providers = {
