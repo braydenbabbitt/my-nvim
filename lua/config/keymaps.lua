@@ -61,8 +61,8 @@ vim.keymap.set("n", "<leader>Xq", function()
 end, { desc = "Quickfix List" })
 
 -- Avante keymaps
-vim.keymap.set("n", "<leader>ac", "<cmd>AvanteClear<CR>", { desc = "Clear Avante Chat" })
-vim.keymap.set("v", "<leader>ac", "<cmd>AvanteClear<CR>", { desc = "Clear Avante Chat" })
+-- vim.keymap.set("n", "<leader>ac", "<cmd>AvanteClear<CR>", { desc = "Clear Avante Chat" })
+-- vim.keymap.set("v", "<leader>ac", "<cmd>AvanteClear<CR>", { desc = "Clear Avante Chat" })
 
 -- Root dir to cwd keymap overrides
 vim.keymap.set("n", "<C-/", "<leader>fT", { desc = "Terminal (CWD)", remap = true })
@@ -72,3 +72,21 @@ end, { desc = "Lazygit (Root Dir)" })
 vim.keymap.set("n", "<leader>gg", function()
   Snacks.lazygit()
 end, { desc = "Lazygit (cwd)" })
+
+-- CodeCompanion keymaps
+vim.keymap.set("n", "<leader>aa", "<cmd>CodeCompanionChat<CR>", { desc = "Open Code Companion Chat" })
+vim.keymap.set(
+  "v",
+  "<leader>aa",
+  ":'<,'>CodeCompanionChat<CR>a<CR><CR>",
+  { desc = "Open Code Companion Chat (with selection)" }
+)
+vim.keymap.set("n", "<leader>at", "<cmd>CodeCompanionChat Toggle<CR>", { desc = "Toggle Code Companion Chat" })
+vim.keymap.set(
+  "v",
+  "<leader>at",
+  ":'<,'>CodeCompanionChat<CR>a<CR><CR>",
+  { desc = "Open Code Companion Chat (with selection)" }
+)
+vim.keymap.set("n", "<leader>ap", "<cmd>CodeCompanionActions<CR>", { desc = "Open CodeCompanion Action Palette" })
+vim.keymap.set("v", "<leader>ap", "<cmd>CodeCompanionActions<CR>", { desc = "Open CodeCompanion Action Palette" })
