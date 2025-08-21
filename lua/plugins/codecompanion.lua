@@ -24,78 +24,78 @@ return {
             },
             regenerate = {
               modes = {
-                n = "ar",
+                n = "<leader>ar",
               },
             },
             stop = {
               modes = {
-                n = "as",
+                n = "<leader>as",
                 i = "<C-q>",
               },
             },
             clear = {
               modes = {
-                n = "ac",
+                n = "<leader>ac",
               },
             },
             codeblock = {
               modes = {
-                n = "aC",
+                n = "<leader>aC",
               },
             },
             yank_code = {
               modes = {
-                n = "ay",
+                n = "<leader>ay",
               },
             },
             pin = {
               modes = {
-                n = "ap",
+                n = "<leader>aP",
               },
             },
             watch = {
               modes = {
-                n = "aw",
+                n = "<leader>aw",
               },
             },
             change_adapter = {
               modes = {
-                n = "aA",
+                n = "<leader>aA",
               },
             },
             fold_code = {
               modes = {
-                n = "az",
+                n = "<leader>az",
               },
             },
             debug = {
               modes = {
-                n = "ad",
+                n = "<leader>ad",
               },
             },
             system_prompt = {
               modes = {
-                n = "aS",
+                n = "<leader>aS",
               },
             },
             auto_tool_mode = {
               modes = {
-                n = "att",
+                n = "<leader>att",
               },
             },
             goto_file_under_cursor = {
               modes = {
-                n = "agd",
+                n = "<leader>agd",
               },
             },
             copilot_stats = {
               modes = {
-                n = "aI",
+                n = "<leader>aI",
               },
             },
             super_diff = {
               modes = {
-                n = "aD",
+                n = "<leader>aD",
               },
             },
           },
@@ -138,11 +138,11 @@ return {
         history = {
           enabled = true,
           opts = {
-            keymap = "ah",
+            keymap = "<leader>h",
             expiration_days = 30,
             summary = {
-              create_summary_keymap = "aHsc",
-              browse_summary_keymap = "aHsb",
+              create_summary_keymap = "<leader>Sc",
+              browse_summary_keymap = "<leader>Sb",
             },
           },
         },

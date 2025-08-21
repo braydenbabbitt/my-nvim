@@ -1,6 +1,7 @@
 return {
   {
     "saghen/blink.cmp",
+    commit = "022521",
     opts = {
       keymap = {
         preset = "super-tab",
