@@ -4,11 +4,39 @@ local default_model = "gpt-4.1"
 return {
   {
     "olimorris/codecompanion.nvim",
+    version = "17.16.0",
     opts = {
+      -- TODO: switch to prompt library once it's fixed
+      -- prompt_library = {
+      --   ["Chat with buffer context"] = {
+      --     strategy = "chat",
+      --     description = "Open a new chat with the current buffer context.",
+      --     prompts = {
+      --       {
+      --         role = "user",
+      --         contect = "#{buffer}",
+      --       },
+      --     },
+      --     opts = {
+      --       mapping = "<leader>aa",
+      --       modes = { "n", "v" },
+      --       short_name = "chat_with_buffer_context",
+      --       auto_submit = false,
+      --       user_prompt = true,
+      --     },
+      --   },
+      -- },
       strategies = {
         chat = {
           adapter = default_adapter,
           model = default_model,
+          variables = {
+            buffer = {
+              opts = {
+                default_params = "pin",
+              },
+            },
+          },
           keymaps = {
             send = {
               modes = {
@@ -116,7 +144,7 @@ return {
             },
             always_accept = {
               modes = {
-                n = "<leader>aa",
+                n = "<leader>ax",
               },
             },
           },

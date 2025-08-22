@@ -74,13 +74,16 @@ vim.keymap.set("n", "<leader>gg", function()
 end, { desc = "Lazygit (cwd)" })
 
 -- CodeCompanion keymaps
-vim.keymap.set("n", "<leader>aa", "<cmd>CodeCompanionChat<CR>", { desc = "Open Code Companion Chat" })
+-- TODO: switch to prompt library once it's fixed
+vim.keymap.set("n", "<leader>aa", "<cmd>CodeCompanionChat<CR>a#{buffer}<CR><CR>", { desc = "Open Code Companion Chat" })
 vim.keymap.set(
   "v",
   "<leader>aa",
-  ":'<,'>CodeCompanionChat<CR>a<CR><CR>",
+  ":'<,'>CodeCompanionChat<CR>a<CR><CR>#{buffer}<CR><CR>",
   { desc = "Open Code Companion Chat (with selection)" }
 )
+vim.keymap.set("n", "<leader>aA", "<cmd>CodeCompanionChat<CR>a", { desc = "Open Code Companion Chat (no context)" })
+vim.keymap.set("v", "<leader>aA", "<cmd>CodeCompanionChat<CR>a", { desc = "Open Code Companion Chat (no context)" })
 vim.keymap.set("n", "<leader>at", "<cmd>CodeCompanionChat Toggle<CR>", { desc = "Toggle Code Companion Chat" })
 vim.keymap.set(
   "v",
