@@ -37,6 +37,13 @@ return {
               },
             },
           },
+          tools = {
+            opts = {
+              default_tools = {
+                "full_stack_dev",
+              },
+            },
+          },
           keymaps = {
             send = {
               modes = {
@@ -131,6 +138,13 @@ return {
         inline = {
           adapter = default_adapter,
           model = default_model,
+          tools = {
+            opts = {
+              default_tools = {
+                "full_stack_dev",
+              },
+            },
+          },
           keymaps = {
             accept_change = {
               modes = {
@@ -151,6 +165,13 @@ return {
         },
         cmd = {
           adapter = default_model,
+          tools = {
+            opts = {
+              default_tools = {
+                "full_stack_dev",
+              },
+            },
+          },
         },
       },
       extensions = {
