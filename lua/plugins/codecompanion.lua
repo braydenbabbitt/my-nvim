@@ -4,6 +4,24 @@ return {
   {
     "olimorris/codecompanion.nvim",
     version = "17.23.0",
+    init = function()
+      -- Check if the Zed ACP package is installed
+      local check_cmd = "npm list -g @zed-industries/claude-code-acp 2>/dev/null"
+      local handle = io.popen(check_cmd)
+      if handle then
+        local result = handle:read("*a")
+        handle:close()
+
+        if not result:match("claude%-code%-acp") then
+          vim.notify(
+            "CodeCompanion requires @zed-industries/claude-code-acp.\n"
+              .. "Please install it with:\n"
+              .. "npm install -g @zed-industries/claude-code-acp@0.4.2",
+            vim.log.levels.WARN
+          )
+        end
+      end
+    end,
     opts = {
       -- TODO: switch to prompt library once it's fixed
       -- prompt_library = {
@@ -30,6 +48,9 @@ return {
       -- end,
       adapters = {
         acp = {
+          -- This requires the Zed Claude Code ACP package to be installed.
+          -- `npm i -g @zed-industries/claude-code-acp`
+          -- See https://github.com/zed-industries/claude-code-acp
           claude_code = function()
             return require("codecompanion.adapters").extend("claude_code", {
               env = {
