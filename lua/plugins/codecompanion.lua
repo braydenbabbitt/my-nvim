@@ -201,6 +201,10 @@ return {
           opts = {
             keymap = "<leader>h",
             expiration_days = 30,
+            auto_title_generation = true,
+            title_generation_opts = {
+              adapter = "copilot",
+            },
             summary = {
               create_summary_keymap = "<leader>Sc",
               browse_summary_keymap = "<leader>Sb",
