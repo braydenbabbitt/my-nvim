@@ -5,8 +5,15 @@
 -- Custom LSP keymaps
 vim.keymap.del("n", "<leader>L")
 vim.keymap.set("n", "<leader>Lrt", function()
-  vim.cmd("LspRestart vtsls")
-  vim.cmd("LspRestart eslint")
+  local servers = { "vtsls", "eslint" }
+  for _, name in ipairs(servers) do
+    for _, client in pairs(vim.lsp.get_clients({ name = name })) do
+      client:stop()
+    end
+    vim.defer_fn(function()
+      vim.cmd("LspStart " .. name)
+    end, 3000)
+  end
 end, { desc = "Restart LSP (vtsls & eslint)", remap = true })
 vim.keymap.set("n", "<leader>Li", "<cmd>LspInfo<CR>", { desc = "LSP Info", remap = true })
 vim.keymap.set(
