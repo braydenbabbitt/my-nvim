@@ -9,6 +9,12 @@ vim.keymap.set("n", "<leader>Lrt", function()
   vim.cmd("LspRestart eslint")
 end, { desc = "Restart LSP (vtsls & eslint)", remap = true })
 vim.keymap.set("n", "<leader>Li", "<cmd>LspInfo<CR>", { desc = "LSP Info", remap = true })
+vim.keymap.set(
+  { "n", "v" },
+  "<leader>Ll",
+  "<cmd>ToggleLspRoot<CR>",
+  { desc = "Toggle LSP Root Detection", remap = true }
+)
 
 -- Beginning and end of file keymaps
 vim.keymap.set("n", "G", "G$", { remap = true })
@@ -63,15 +69,6 @@ end, { desc = "Quickfix List" })
 -- Avante keymaps
 -- vim.keymap.set("n", "<leader>ac", "<cmd>AvanteClear<CR>", { desc = "Clear Avante Chat" })
 -- vim.keymap.set("v", "<leader>ac", "<cmd>AvanteClear<CR>", { desc = "Clear Avante Chat" })
-
--- Root dir to cwd keymap overrides
-vim.keymap.set("n", "<C-/", "<leader>fT", { desc = "Terminal (CWD)", remap = true })
-vim.keymap.set("n", "<leader>gG", function()
-  Snacks.lazygit({ cwd = LazyVim.root.git() })
-end, { desc = "Lazygit (Root Dir)" })
-vim.keymap.set("n", "<leader>gg", function()
-  Snacks.lazygit()
-end, { desc = "Lazygit (cwd)" })
 
 -- CodeCompanion keymaps
 -- TODO: switch to prompt library once it's fixed
