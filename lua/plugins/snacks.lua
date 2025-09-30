@@ -12,6 +12,13 @@ return {
           },
         },
       },
+      terminal = {
+        win = {
+          wo = {
+            winbar = "",
+          },
+        },
+      },
     },
   },
 }

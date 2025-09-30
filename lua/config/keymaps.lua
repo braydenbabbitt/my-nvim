@@ -72,21 +72,29 @@ end, { desc = "Quickfix List" })
 
 -- CodeCompanion keymaps
 -- TODO: switch to prompt library once it's fixed
-vim.keymap.set("n", "<leader>aa", "<cmd>CodeCompanionChat<CR>a#{buffer}<CR><CR>", { desc = "Open Code Companion Chat" })
-vim.keymap.set(
-  "v",
-  "<leader>aa",
-  ":'<,'>CodeCompanionChat<CR>a<CR><CR>#{buffer}<CR><CR>",
-  { desc = "Open Code Companion Chat (with selection)" }
-)
-vim.keymap.set("n", "<leader>aA", "<cmd>CodeCompanionChat<CR>a", { desc = "Open Code Companion Chat (no context)" })
-vim.keymap.set("v", "<leader>aA", "<cmd>CodeCompanionChat<CR>a", { desc = "Open Code Companion Chat (no context)" })
-vim.keymap.set("n", "<leader>at", "<cmd>CodeCompanionChat Toggle<CR>", { desc = "Toggle Code Companion Chat" })
-vim.keymap.set(
-  "v",
-  "<leader>at",
-  ":'<,'>CodeCompanionChat<CR>a<CR><CR>",
-  { desc = "Open Code Companion Chat (with selection)" }
-)
-vim.keymap.set("n", "<leader>ap", "<cmd>CodeCompanionActions<CR>", { desc = "Open CodeCompanion Action Palette" })
-vim.keymap.set("v", "<leader>ap", "<cmd>CodeCompanionActions<CR>", { desc = "Open CodeCompanion Action Palette" })
+-- vim.keymap.set("n", "<leader>aa", "<cmd>CodeCompanionChat<CR>a#{buffer}<CR><CR>", { desc = "Open Code Companion Chat" })
+-- vim.keymap.set(
+--   "v",
+--   "<leader>aa",
+--   ":'<,'>CodeCompanionChat<CR>a<CR><CR>#{buffer}<CR><CR>",
+--   { desc = "Open Code Companion Chat (with selection)" }
+-- )
+-- vim.keymap.set("n", "<leader>aA", "<cmd>CodeCompanionChat<CR>a", { desc = "Open Code Companion Chat (no context)" })
+-- vim.keymap.set("v", "<leader>aA", "<cmd>CodeCompanionChat<CR>a", { desc = "Open Code Companion Chat (no context)" })
+-- vim.keymap.set("n", "<leader>at", "<cmd>CodeCompanionChat Toggle<CR>", { desc = "Toggle Code Companion Chat" })
+-- vim.keymap.set(
+--   "v",
+--   "<leader>at",
+--   ":'<,'>CodeCompanionChat<CR>a<CR><CR>",
+--   { desc = "Open Code Companion Chat (with selection)" }
+-- )
+-- vim.keymap.set("n", "<leader>ap", "<cmd>CodeCompanionActions<CR>", { desc = "Open CodeCompanion Action Palette" })
+-- vim.keymap.set("v", "<leader>ap", "<cmd>CodeCompanionActions<CR>", { desc = "Open CodeCompanion Action Palette" })
+
+-- Simple Claude Code in right terminal
+vim.keymap.set("n", "<leader>aa", function()
+  Snacks.terminal("claude", { win = { position = "right" } })
+end, { desc = "Open Claude in right terminal" })
+vim.keymap.set("n", "<leader>at", function()
+  Snacks.terminal.toggle("claude", { win = { position = "right" } })
+end, { desc = "Toggle Claude terminal" })
