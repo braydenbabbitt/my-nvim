@@ -1,0 +1,152 @@
+-- Core keymaps
+-- All custom keybindings for the config
+
+-- Set leader key (must be set before loading plugins)
+vim.g.mapleader = " "
+vim.g.maplocalleader = " "
+
+-- Escape alternatives
+vim.keymap.set("v", "<C-space>", "<Esc>", { noremap = true, desc = "Exit visual mode" })
+vim.keymap.set("v", "<C-@>", "<Esc>", { noremap = true, desc = "Exit visual mode" })
+-- Note: insert mode C-space handled by blink.cmp config
+
+-- Ctrl-c warning (prefer <C-space> to avoid bugs)
+vim.keymap.set("i", "<C-c>", function()
+  vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes("<C-c>", true, false, true), "n", true)
+  vim.api.nvim_echo({
+    {
+      "Using <C-c> to exit insert mode should only be used in emergencies.\nUse the custom <C-Space> remap instead to avoid buggy behavior",
+      "WarningMsg",
+    },
+  }, true, {})
+end, { noremap = true, desc = "Emergency exit with warning" })
+
+-- Beginning and end of file keymaps
+vim.keymap.set("n", "G", "G$", { remap = true, desc = "Go to end of file and line" })
+vim.keymap.set("v", "G", "G$", { remap = true, desc = "Go to end of file and line" })
+vim.keymap.set("n", "gg", "gg0", { remap = true, desc = "Go to start of file and line" })
+vim.keymap.set("v", "gg", "gg0", { remap = true, desc = "Go to start of file and line" })
+
+-- Blackhole register delete (delete without yanking)
+vim.keymap.set("n", "<leader>x", '"_x', { noremap = true, silent = true, desc = "Delete char (no yank)" })
+vim.keymap.set("v", "<leader>x", '"_x', { noremap = true, silent = true, desc = "Delete selection (no yank)" })
+vim.keymap.set("n", "<leader>d", '"_d', { noremap = true, silent = true, desc = "Delete (no yank)" })
+vim.keymap.set("v", "<leader>d", '"_d', { noremap = true, silent = true, desc = "Delete (no yank)" })
+
+-- Reset windows and buffers
+vim.keymap.set("n", "<leader>R", function()
+  if Snacks then
+    Snacks.bufdelete.all()
+  end
+  if vim.fn.winnr("$") > 1 then
+    vim.cmd("only")
+  end
+end, { desc = "Reset Windows and Buffers", remap = true })
+
+-- LSP keymaps
+vim.keymap.set("n", "<leader>Lrt", function()
+  local servers = { "vtsls", "eslint" }
+  for _, name in ipairs(servers) do
+    for _, client in pairs(vim.lsp.get_clients({ name = name })) do
+      client:stop()
+    end
+    vim.defer_fn(function()
+      vim.cmd("LspStart " .. name)
+    end, 3000)
+  end
+end, { desc = "Restart LSP (vtsls & eslint)", remap = true })
+
+vim.keymap.set("n", "<leader>Li", "<cmd>LspInfo<CR>", { desc = "LSP Info", remap = true })
+vim.keymap.set({ "n", "v" }, "<leader>Ll", "<cmd>ToggleLspRoot<CR>", { desc = "Toggle LSP Root Detection", remap = true })
+vim.keymap.set("n", "<leader>gd", "gd", { desc = "Go to Definition", remap = true })
+
+-- Diagnostic keymaps (quickfix/loclist)
+vim.keymap.set("n", "<leader>Xl", function()
+  local success, err = pcall(function()
+    if vim.fn.getloclist(0, { winid = 0 }).winid ~= 0 then
+      vim.cmd.lclose()
+    else
+      vim.cmd.lopen()
+    end
+  end)
+  if not success and err then
+    vim.notify(err, vim.log.levels.ERROR)
+  end
+end, { desc = "Toggle Location List" })
+
+vim.keymap.set("n", "<leader>Xq", function()
+  local success, err = pcall(function()
+    if vim.fn.getqflist({ winid = 0 }).winid ~= 0 then
+      vim.cmd.cclose()
+    else
+      vim.cmd.copen()
+    end
+  end)
+  if not success and err then
+    vim.notify(err, vim.log.levels.ERROR)
+  end
+end, { desc = "Toggle Quickfix List" })
+
+-- Claude terminal keymaps (requires Snacks.nvim)
+vim.keymap.set("n", "<leader>aa", function()
+  if Snacks then
+    Snacks.terminal("claude", { win = { position = "right" } })
+  end
+end, { desc = "Open Claude in right terminal" })
+
+vim.keymap.set("n", "<leader>at", function()
+  if Snacks then
+    Snacks.terminal.toggle("claude", { win = { position = "right" } })
+  end
+end, { desc = "Toggle Claude terminal" })
+
+-- Buffer navigation
+vim.keymap.set("n", "<S-h>", "<cmd>bprevious<cr>", { desc = "Previous buffer" })
+vim.keymap.set("n", "<S-l>", "<cmd>bnext<cr>", { desc = "Next buffer" })
+vim.keymap.set("n", "[b", "<cmd>bprevious<cr>", { desc = "Previous buffer" })
+vim.keymap.set("n", "]b", "<cmd>bnext<cr>", { desc = "Next buffer" })
+
+-- Clear search highlight
+vim.keymap.set("n", "<Esc>", "<cmd>nohlsearch<CR>", { desc = "Clear search highlight" })
+
+-- Better indenting
+vim.keymap.set("v", "<", "<gv", { desc = "Indent left" })
+vim.keymap.set("v", ">", ">gv", { desc = "Indent right" })
+
+-- Move lines
+vim.keymap.set("n", "<A-j>", "<cmd>m .+1<cr>==", { desc = "Move line down" })
+vim.keymap.set("n", "<A-k>", "<cmd>m .-2<cr>==", { desc = "Move line up" })
+vim.keymap.set("i", "<A-j>", "<esc><cmd>m .+1<cr>==gi", { desc = "Move line down" })
+vim.keymap.set("i", "<A-k>", "<esc><cmd>m .-2<cr>==gi", { desc = "Move line up" })
+vim.keymap.set("v", "<A-j>", ":m '>+1<cr>gv=gv", { desc = "Move selection down" })
+vim.keymap.set("v", "<A-k>", ":m '<-2<cr>gv=gv", { desc = "Move selection up" })
+
+-- Window navigation
+vim.keymap.set("n", "<C-h>", "<C-w>h", { desc = "Go to left window" })
+vim.keymap.set("n", "<C-j>", "<C-w>j", { desc = "Go to lower window" })
+vim.keymap.set("n", "<C-k>", "<C-w>k", { desc = "Go to upper window" })
+vim.keymap.set("n", "<C-l>", "<C-w>l", { desc = "Go to right window" })
+
+-- Window navigation in terminal mode
+vim.keymap.set("t", "<C-h>", "<cmd>wincmd h<cr>", { desc = "Go to left window" })
+vim.keymap.set("t", "<C-j>", "<cmd>wincmd j<cr>", { desc = "Go to lower window" })
+vim.keymap.set("t", "<C-k>", "<cmd>wincmd k<cr>", { desc = "Go to upper window" })
+vim.keymap.set("t", "<C-l>", "<cmd>wincmd l<cr>", { desc = "Go to right window" })
+
+-- Terminal mode escape
+vim.keymap.set("t", "<Esc><Esc>", "<C-\\><C-n>", { desc = "Exit terminal mode" })
+
+-- Window management
+vim.keymap.set("n", "<leader>ww", "<C-W>p", { desc = "Other window", remap = true })
+vim.keymap.set("n", "<leader>wd", "<C-W>c", { desc = "Delete window", remap = true })
+vim.keymap.set("n", "<leader>w-", "<C-W>s", { desc = "Split window below", remap = true })
+vim.keymap.set("n", "<leader>w|", "<C-W>v", { desc = "Split window right", remap = true })
+
+-- Resize windows
+vim.keymap.set("n", "<C-Up>", "<cmd>resize +2<cr>", { desc = "Increase window height" })
+vim.keymap.set("n", "<C-Down>", "<cmd>resize -2<cr>", { desc = "Decrease window height" })
+vim.keymap.set("n", "<C-Left>", "<cmd>vertical resize -2<cr>", { desc = "Decrease window width" })
+vim.keymap.set("n", "<C-Right>", "<cmd>vertical resize +2<cr>", { desc = "Increase window width" })
+
+-- Quit/Save shortcuts
+vim.keymap.set("n", "<leader>qq", "<cmd>qa<cr>", { desc = "Quit all" })

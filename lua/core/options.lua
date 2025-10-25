@@ -1,9 +1,39 @@
--- Options are automatically loaded before lazy.nvim startup
--- Default options that are always set: https://github.com/LazyVim/LazyVim/blob/main/lua/lazyvim/config/options.lua
--- Add any additional options here
+-- Core Neovim options
+-- Sets up all vim options and global variables
 
+-- Disable snacks animation
 vim.g.snacks_animate = false
 
+-- Basic editor settings
+vim.opt.number = true -- Show line numbers
+vim.opt.relativenumber = true -- Show relative line numbers
+vim.opt.mouse = "a" -- Enable mouse support
+vim.opt.clipboard = "unnamedplus" -- Use system clipboard
+vim.opt.breakindent = true -- Preserve indent on wrapped lines
+vim.opt.undofile = true -- Enable persistent undo
+vim.opt.ignorecase = true -- Case insensitive search
+vim.opt.smartcase = true -- Case sensitive when using capitals
+vim.opt.signcolumn = "yes" -- Always show sign column
+vim.opt.updatetime = 250 -- Decrease update time
+vim.opt.timeoutlen = 300 -- Decrease timeout length
+vim.opt.splitright = true -- Vertical splits go right
+vim.opt.splitbelow = true -- Horizontal splits go below
+vim.opt.list = true -- Show whitespace characters
+vim.opt.listchars = { tab = "» ", trail = "·", nbsp = "␣" }
+vim.opt.inccommand = "split" -- Preview substitutions live
+vim.opt.cursorline = true -- Highlight current line
+vim.opt.scrolloff = 10 -- Minimal lines to keep above/below cursor
+vim.opt.hlsearch = true -- Highlight search results
+vim.opt.cmdheight = 0 -- Hide command line when not in use
+vim.opt.laststatus = 3 -- Global statusline
+
+-- Tab settings
+vim.opt.expandtab = true -- Use spaces instead of tabs
+vim.opt.shiftwidth = 2 -- Size of indent
+vim.opt.tabstop = 2 -- Number of spaces tabs count for
+vim.opt.softtabstop = 2 -- Number of spaces for tab in insert mode
+
+-- LSP root detection configuration
 -- Helper function to check if LSP is in root_spec
 function HasLspInRootSpec()
   local spec = vim.g.root_spec or {}
