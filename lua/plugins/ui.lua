@@ -138,6 +138,7 @@ return {
       preset = "modern",
       spec = {
         { "<leader>a", group = "AI Tools" },
+        { "<leader>b", group = "Buffers" },
         { "<leader>c", group = "Code" },
         { "<leader>d", desc = "Blackhole Register Delete" },
         { "<leader>x", desc = "Blackhole Register Delete" },
@@ -147,6 +148,7 @@ return {
         { "<leader>g", group = "Git" },
         { "<leader>L", group = "LSP" },
         { "<leader>Lr", group = "LSP Restart" },
+        { "<leader>q", group = "Quit/Session" },
         { "<leader>s", group = "Search" },
         { "<leader>u", group = "UI" },
         { "<leader>w", group = "Windows" },
@@ -165,8 +167,37 @@ return {
       animate = {
         enabled = false,
       },
-      -- Picker configuration
+      -- Dashboard
+      dashboard = {
+        enabled = true,
+        preset = {
+          keys = {
+            { icon = " ", key = "f", desc = "Find File", action = ":lua Snacks.picker.files()" },
+            { icon = " ", key = "n", desc = "New File", action = ":ene | startinsert" },
+            { icon = " ", key = "g", desc = "Find Text", action = ":lua Snacks.picker.grep()" },
+            { icon = " ", key = "r", desc = "Recent Files", action = ":lua Snacks.picker.recent()" },
+            { icon = " ", key = "c", desc = "Config", action = ":lua Snacks.picker.files({ cwd = vim.fn.stdpath('config') })" },
+            { icon = " ", key = "s", desc = "Restore Session", section = "session" },
+            { icon = "󰒲 ", key = "L", desc = "Lazy", action = ":Lazy", enabled = package.loaded.lazy ~= nil },
+            { icon = " ", key = "q", desc = "Quit", action = ":qa" },
+          },
+          header = [[
+███╗   ██╗███████╗ ██████╗ ██╗   ██╗██╗███╗   ███╗
+████╗  ██║██╔════╝██╔═══██╗██║   ██║██║████╗ ████║
+██╔██╗ ██║█████╗  ██║   ██║██║   ██║██║██╔████╔██║
+██║╚██╗██║██╔══╝  ██║   ██║╚██╗ ██╔╝██║██║╚██╔╝██║
+██║ ╚████║███████╗╚██████╔╝ ╚████╔╝ ██║██║ ╚═╝ ██║
+╚═╝  ╚═══╝╚══════╝ ╚═════╝   ╚═══╝  ╚═╝╚═╝     ╚═╝]],
+        },
+        sections = {
+          { section = "header" },
+          { section = "keys", gap = 1, padding = 1 },
+          { section = "startup" },
+        },
+      },
+      -- Picker configuration (file finder, file explorer)
       picker = {
+        enabled = true,
         sources = {
           explorer = {
             auto_close = true,
@@ -178,6 +209,7 @@ return {
       },
       -- Terminal configuration
       terminal = {
+        enabled = true,
         win = {
           wo = {
             winbar = "",
@@ -185,9 +217,13 @@ return {
         },
       },
       -- Buffer delete
-      bufdelete = {},
+      bufdelete = {
+        enabled = true,
+      },
       -- Profiler
-      profiler = {},
+      profiler = {
+        enabled = true,
+      },
       -- Notifier
       notifier = {
         enabled = true,
@@ -197,12 +233,163 @@ return {
       statuscolumn = {
         enabled = false,
       },
-      -- Words
+      -- Words (highlight word under cursor)
       words = {
+        enabled = true,
+      },
+      -- Quickfile (fast file detection)
+      quickfile = {
+        enabled = true,
+      },
+      -- Git integration
+      git = {
+        enabled = true,
+      },
+      -- Lazygit integration
+      lazygit = {
         enabled = true,
       },
     },
     keys = {
+      -- File explorer
+      {
+        "<leader>e",
+        function()
+          Snacks.picker.explorer()
+        end,
+        desc = "Explorer",
+      },
+      -- File pickers
+      {
+        "<leader>ff",
+        function()
+          Snacks.picker.files()
+        end,
+        desc = "Find Files",
+      },
+      {
+        "<leader>fg",
+        function()
+          Snacks.picker.grep()
+        end,
+        desc = "Grep",
+      },
+      {
+        "<leader>fb",
+        function()
+          Snacks.picker.buffers()
+        end,
+        desc = "Buffers",
+      },
+      {
+        "<leader>fr",
+        function()
+          Snacks.picker.recent()
+        end,
+        desc = "Recent Files",
+      },
+      {
+        "<leader>fc",
+        function()
+          Snacks.picker.files({ cwd = vim.fn.stdpath("config") })
+        end,
+        desc = "Find Config File",
+      },
+      {
+        "<leader>fh",
+        function()
+          Snacks.picker.help()
+        end,
+        desc = "Help Pages",
+      },
+      {
+        "<leader>fk",
+        function()
+          Snacks.picker.keymaps()
+        end,
+        desc = "Keymaps",
+      },
+      {
+        "<leader>:",
+        function()
+          Snacks.picker.command_history()
+        end,
+        desc = "Command History",
+      },
+      {
+        "<leader>/",
+        function()
+          Snacks.picker.lines()
+        end,
+        desc = "Search Lines",
+      },
+      -- Git
+      {
+        "<leader>gc",
+        function()
+          Snacks.picker.git_log()
+        end,
+        desc = "Git Log",
+      },
+      {
+        "<leader>gs",
+        function()
+          Snacks.picker.git_status()
+        end,
+        desc = "Git Status",
+      },
+      {
+        "<leader>gg",
+        function()
+          Snacks.lazygit()
+        end,
+        desc = "Lazygit",
+      },
+      {
+        "<leader>gf",
+        function()
+          Snacks.lazygit.log_file()
+        end,
+        desc = "Lazygit Current File History",
+      },
+      {
+        "<leader>gl",
+        function()
+          Snacks.lazygit.log()
+        end,
+        desc = "Lazygit Log (cwd)",
+      },
+      -- Notifications
+      {
+        "<leader>n",
+        function()
+          Snacks.notifier.show_history()
+        end,
+        desc = "Notification History",
+      },
+      {
+        "<leader>un",
+        function()
+          Snacks.notifier.hide()
+        end,
+        desc = "Dismiss All Notifications",
+      },
+      -- Buffer delete
+      {
+        "<leader>bd",
+        function()
+          Snacks.bufdelete()
+        end,
+        desc = "Delete Buffer",
+      },
+      {
+        "<leader>bo",
+        function()
+          Snacks.bufdelete.other()
+        end,
+        desc = "Delete Other Buffers",
+      },
+      -- Scratch buffer
       {
         "<leader>.",
         function()
@@ -217,20 +404,7 @@ return {
         end,
         desc = "Select Scratch Buffer",
       },
-      {
-        "<leader>n",
-        function()
-          Snacks.notifier.show_history()
-        end,
-        desc = "Notification History",
-      },
-      {
-        "<leader>bd",
-        function()
-          Snacks.bufdelete()
-        end,
-        desc = "Delete Buffer",
-      },
+      -- Profiler
       {
         "<leader>Dps",
         function()

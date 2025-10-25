@@ -40,60 +40,17 @@ return {
     },
   },
 
-  -- Telescope (optional - if you want file finding)
-  {
-    "nvim-telescope/telescope.nvim",
-    cmd = "Telescope",
-    dependencies = {
-      "nvim-lua/plenary.nvim",
-      {
-        "nvim-telescope/telescope-fzf-native.nvim",
-        build = "make",
-      },
-    },
-    opts = {
-      defaults = {
-        prompt_prefix = " ",
-        selection_caret = " ",
-        path_display = { "truncate" },
-        sorting_strategy = "ascending",
-        layout_config = {
-          horizontal = { prompt_position = "top", preview_width = 0.55 },
-          vertical = { mirror = false },
-          width = 0.87,
-          height = 0.80,
-          preview_cutoff = 120,
-        },
-        mappings = {
-          i = {
-            ["<C-n>"] = "move_selection_next",
-            ["<C-p>"] = "move_selection_previous",
-            ["<C-c>"] = "close",
-            ["<C-j>"] = "move_selection_next",
-            ["<C-k>"] = "move_selection_previous",
-            ["<C-q>"] = "send_to_qflist",
-            ["<M-q>"] = "send_selected_to_qflist",
-          },
-        },
-      },
-    },
-    keys = {
-      { "<leader>ff", "<cmd>Telescope find_files<cr>", desc = "Find Files" },
-      { "<leader>fg", "<cmd>Telescope live_grep<cr>", desc = "Live Grep" },
-      { "<leader>fb", "<cmd>Telescope buffers<cr>", desc = "Buffers" },
-      { "<leader>fh", "<cmd>Telescope help_tags<cr>", desc = "Help Tags" },
-      { "<leader>fr", "<cmd>Telescope oldfiles<cr>", desc = "Recent Files" },
-      { "<leader>fc", "<cmd>Telescope commands<cr>", desc = "Commands" },
-      { "<leader>fk", "<cmd>Telescope keymaps<cr>", desc = "Keymaps" },
-    },
-  },
-
-  -- Telescope FZF native
-  {
-    "nvim-telescope/telescope-fzf-native.nvim",
-    build = "make",
-    lazy = true,
-  },
+  -- Telescope (commented out - using Snacks.picker instead)
+  -- Uncomment if you prefer Telescope over Snacks.picker
+  -- {
+  --   "nvim-telescope/telescope.nvim",
+  --   cmd = "Telescope",
+  --   dependencies = { "nvim-lua/plenary.nvim" },
+  --   keys = {
+  --     { "<leader>fh", "<cmd>Telescope help_tags<cr>", desc = "Help Tags" },
+  --     { "<leader>fk", "<cmd>Telescope keymaps<cr>", desc = "Keymaps" },
+  --   },
+  -- },
 
   -- Markdown preview
   {
