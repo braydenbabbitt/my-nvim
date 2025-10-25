@@ -71,3 +71,37 @@ vim.api.nvim_create_autocmd("BufReadPost", {
     end
   end,
 })
+
+-- Fix Snacks terminal to allow global :q/:qa commands
+-- Snacks terminal creates buffer-local keymaps and autocmds that intercept quit commands
+vim.api.nvim_create_autocmd("FileType", {
+  pattern = "snacks_terminal",
+  callback = function(event)
+    -- Use a longer delay to ensure Snacks has finished setting up
+    vim.defer_fn(function()
+      if not vim.api.nvim_buf_is_valid(event.buf) then
+        return
+      end
+
+      -- Clear ALL autocmds on this buffer for ExitPre
+      local autocmds = vim.api.nvim_get_autocmds({ event = "ExitPre", buffer = event.buf })
+      for _, au in ipairs(autocmds) do
+        pcall(vim.api.nvim_del_autocmd, au.id)
+      end
+
+      -- Also clear global ExitPre autocmds that might reference this buffer
+      local all_exit_autocmds = vim.api.nvim_get_autocmds({ event = "ExitPre" })
+      for _, au in ipairs(all_exit_autocmds) do
+        if au.buflocal == false then
+          -- Check if this is a Snacks autocmd by looking at the group name
+          if au.group_name and au.group_name:match("snacks") then
+            pcall(vim.api.nvim_del_autocmd, au.id)
+          end
+        end
+      end
+
+      -- Remove the buffer-local 'q' keymap that hides the terminal
+      pcall(vim.keymap.del, "n", "q", { buffer = event.buf })
+    end, 100)
+  end,
+})

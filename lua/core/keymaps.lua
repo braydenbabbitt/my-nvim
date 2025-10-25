@@ -134,7 +134,7 @@ vim.keymap.set("t", "<C-k>", "<cmd>wincmd k<cr>", { desc = "Go to upper window" 
 vim.keymap.set("t", "<C-l>", "<cmd>wincmd l<cr>", { desc = "Go to right window" })
 
 -- Terminal mode escape
-vim.keymap.set("t", "<Esc><Esc>", "<C-\\><C-n>", { desc = "Exit terminal mode" })
+vim.keymap.set("t", "<Esc>", "<C-\\><C-n>", { desc = "Exit terminal mode" })
 
 -- Window management
 vim.keymap.set("n", "<leader>ww", "<C-W>p", { desc = "Other window", remap = true })
@@ -150,3 +150,30 @@ vim.keymap.set("n", "<C-Right>", "<cmd>vertical resize +2<cr>", { desc = "Increa
 
 -- Quit/Save shortcuts
 vim.keymap.set("n", "<leader>qq", "<cmd>qa<cr>", { desc = "Quit all" })
+
+-- Debug command to check terminal buffer settings
+vim.api.nvim_create_user_command("TerminalDebug", function()
+  local buf = vim.api.nvim_get_current_buf()
+  local ft = vim.bo[buf].filetype
+  print("Buffer: " .. buf)
+  print("Filetype: " .. ft)
+  print("\nAutocmds (ExitPre):")
+  local autocmds = vim.api.nvim_get_autocmds({ event = "ExitPre", buffer = buf })
+  for _, cmd in ipairs(autocmds) do
+    print(vim.inspect(cmd))
+  end
+  print("\nBuffer keymaps:")
+  local keymaps = vim.api.nvim_buf_get_keymap(buf, "n")
+  for _, map in ipairs(keymaps) do
+    if map.lhs:match("q") then
+      print(vim.inspect(map))
+    end
+  end
+  print("\nBuffer commands:")
+  local commands = vim.api.nvim_buf_get_commands(buf, {})
+  for name, cmd in pairs(commands) do
+    if name:match("[Qq]") then
+      print(name .. ": " .. vim.inspect(cmd))
+    end
+  end
+end, {})

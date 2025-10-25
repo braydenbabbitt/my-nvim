@@ -51,6 +51,12 @@ return {
           winbar = "",
         },
       },
+      -- Override default keymaps to prevent buffer-local command overrides
+      keys = {
+        q = false, -- Disable 'q' to hide terminal, allow global commands
+        gf = "gf", -- Keep gf behavior
+        term_normal = false, -- Disable double escape (we have single escape configured)
+      },
     },
   },
   keys = {
