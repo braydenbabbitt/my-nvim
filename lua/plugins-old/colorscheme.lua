@@ -1,6 +1,4 @@
--- Colorscheme configuration
 return {
-  -- VSCode theme
   {
     "Mofiqul/vscode.nvim",
     lazy = false,
@@ -19,11 +17,8 @@ return {
         CursorLineNr = { fg = c.vscUiOrange, bg = "NONE" },
       }
       require("vscode").setup(opts)
-      vim.cmd.colorscheme("vscode")
     end,
   },
-
-  -- Tokyo Night theme
   {
     "folke/tokyonight.nvim",
     lazy = false,
@@ -37,11 +32,9 @@ return {
       },
     },
   },
-
-  -- Catppuccin theme
   {
     "catppuccin/nvim",
-    name = "catppuccin",
+    -- name = "catppuccin",
     lazy = false,
     priority = 1000,
     opts = {
@@ -62,6 +55,13 @@ return {
           crust = "#040408",
         },
       },
+    },
+  },
+  -- Apply the selected colorscheme
+  {
+    "LazyVim/LazyVim",
+    opts = {
+      colorscheme = "vscode",
     },
   },
 }
