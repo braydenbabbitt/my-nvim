@@ -70,6 +70,9 @@ return {
           map("<leader>ca", vim.lsp.buf.code_action, "Code Action")
           map("<leader>cr", vim.lsp.buf.rename, "Rename")
 
+          -- Diagnostics
+          map("<leader>cd", vim.diagnostic.open_float, "Line Diagnostics")
+
           -- Documentation
           map("K", vim.lsp.buf.hover, "Hover Documentation")
           map("gK", vim.lsp.buf.signature_help, "Signature Help")
@@ -79,11 +82,30 @@ return {
           if client and client.server_capabilities.inlayHintProvider and vim.lsp.inlay_hint then
             -- Inlay hints are disabled by default in options.lua
             -- Uncomment to add toggle:
-            -- map('<leader>th', function()
-            --   vim.lsp.inlay_hint.enable(not vim.lsp.inlay_hint.is_enabled())
-            -- end, '[T]oggle Inlay [H]ints')
+            map("<leader>th", function()
+              vim.lsp.inlay_hint.enable(not vim.lsp.inlay_hint.is_enabled())
+            end, "[T]oggle Inlay [H]ints")
           end
         end,
+      })
+
+      -- Configure diagnostic display
+      vim.diagnostic.config({
+        virtual_text = {
+          spacing = 4,
+          source = "if_many",
+          prefix = "●",
+        },
+        signs = true,
+        underline = true,
+        update_in_insert = false,
+        severity_sort = true,
+        float = {
+          border = "rounded",
+          source = "if_many",
+          header = "",
+          prefix = "",
+        },
       })
 
       -- Default LSP capabilities (completion support)
@@ -110,7 +132,16 @@ return {
       vim.lsp.config.lua_ls = {
         cmd = { "lua-language-server" },
         filetypes = { "lua" },
-        root_markers = { ".luarc.json", ".luarc.jsonc", ".luacheckrc", ".stylua.toml", "stylua.toml", "selene.toml", "selene.yml", ".git" },
+        root_dir = root_pattern(
+          ".luarc.json",
+          ".luarc.jsonc",
+          ".luacheckrc",
+          ".stylua.toml",
+          "stylua.toml",
+          "selene.toml",
+          "selene.yml",
+          ".git"
+        ),
         capabilities = capabilities,
         settings = {
           Lua = {
@@ -134,7 +165,7 @@ return {
       vim.lsp.config.vtsls = {
         cmd = { "vtsls", "--stdio" },
         filetypes = { "typescript", "javascript", "typescriptreact", "javascriptreact" },
-        root_markers = { "package.json" },
+        root_dir = root_pattern("package.json"),
         single_file_support = false,
         capabilities = capabilities,
       }
@@ -143,7 +174,7 @@ return {
       vim.lsp.config.denols = {
         cmd = { "deno", "lsp" },
         filetypes = { "typescript", "javascript", "typescriptreact", "javascriptreact" },
-        root_markers = { "deno.json", "deno.jsonc", "deno.lock" },
+        root_dir = root_pattern("deno.json", "deno.jsonc", "deno.lock"),
         single_file_support = false,
         capabilities = capabilities,
         init_options = {
@@ -164,7 +195,7 @@ return {
           "svelte",
           "astro",
         },
-        root_markers = {
+        root_dir = root_pattern(
           ".eslintrc",
           ".eslintrc.js",
           ".eslintrc.cjs",
@@ -172,8 +203,8 @@ return {
           ".eslintrc.yml",
           ".eslintrc.json",
           "eslint.config.js",
-          "package.json",
-        },
+          "package.json"
+        ),
         capabilities = capabilities,
         settings = {
           workingDirectories = { mode = "auto" },
@@ -190,8 +221,36 @@ return {
 
       -- Enable LSP servers
       vim.lsp.enable("lua_ls")
-      vim.lsp.enable("vtsls")
-      vim.lsp.enable("denols")
+
+      -- Only enable one of vtsls or denols based on project type
+      -- Check if current buffer's directory has deno markers
+      local function is_deno_project(bufnr)
+        local fname = vim.api.nvim_buf_get_name(bufnr or 0)
+        if fname == "" then
+          return false
+        end
+        local deno_markers = { "deno.json", "deno.jsonc", "deno.lock" }
+        for _, marker in ipairs(deno_markers) do
+          local found = vim.fs.find(marker, { path = fname, upward = true })
+          if found and #found > 0 then
+            return true
+          end
+        end
+        return false
+      end
+
+      -- Create autocmd to conditionally enable vtsls or denols
+      vim.api.nvim_create_autocmd("FileType", {
+        pattern = { "typescript", "javascript", "typescriptreact", "javascriptreact" },
+        callback = function(args)
+          if is_deno_project(args.buf) then
+            vim.lsp.enable("denols")
+          else
+            vim.lsp.enable("vtsls")
+          end
+        end,
+      })
+
       vim.lsp.enable("eslint")
       vim.lsp.enable("postgres_lsp")
     end,
