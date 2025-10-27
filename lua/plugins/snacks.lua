@@ -58,6 +58,29 @@ return {
         term_normal = false, -- Disable double escape (we have single escape configured)
       },
     },
+
+    -- Lazygit configuration
+    lazygit = {
+      enabled = true,
+      configure = true,
+      config = {
+        os = {
+          -- Custom edit commands that don't use --remote-tab to avoid tab issues
+          -- Use --remote-send to open file in the most recent non-terminal window
+          edit = "nvim --server \"$NVIM\" --remote-send \"<C-\\><C-n>:lua vim.schedule(function() local lazygit_win = vim.api.nvim_get_current_win(); local target_win = nil; for _, win in ipairs(vim.api.nvim_list_wins()) do local buf = vim.api.nvim_win_get_buf(win); if vim.bo[buf].buftype == '' and win ~= lazygit_win then target_win = win; break; end; end; if target_win then vim.api.nvim_set_current_win(target_win); end; vim.cmd('edit {{filename}}'); pcall(vim.api.nvim_win_close, lazygit_win, true); end)<CR>\"",
+          editAtLine = "nvim --server \"$NVIM\" --remote-send \"<C-\\><C-n>:lua vim.schedule(function() local lazygit_win = vim.api.nvim_get_current_win(); local target_win = nil; for _, win in ipairs(vim.api.nvim_list_wins()) do local buf = vim.api.nvim_win_get_buf(win); if vim.bo[buf].buftype == '' and win ~= lazygit_win then target_win = win; break; end; end; if target_win then vim.api.nvim_set_current_win(target_win); end; vim.cmd('edit +{{line}} {{filename}}'); pcall(vim.api.nvim_win_close, lazygit_win, true); end)<CR>\"",
+          editAtLineAndWait = "nvim --server \"$NVIM\" --remote-send \"<C-\\><C-n>:lua vim.schedule(function() local lazygit_win = vim.api.nvim_get_current_win(); local target_win = nil; for _, win in ipairs(vim.api.nvim_list_wins()) do local buf = vim.api.nvim_win_get_buf(win); if vim.bo[buf].buftype == '' and win ~= lazygit_win then target_win = win; break; end; end; if target_win then vim.api.nvim_set_current_win(target_win); end; vim.cmd('edit +{{line}} {{filename}}'); pcall(vim.api.nvim_win_close, lazygit_win, true); end)<CR>\"",
+        },
+      },
+      win = {
+        style = "lazygit",
+      },
+    },
+
+    -- Styles configuration for terminal windows
+    styles = {
+      lazygit = {},
+    },
   },
   keys = {
     -- Dashboard
@@ -191,9 +214,9 @@ return {
         Snacks.toggle.option("relativenumber", { name = "Relative Number" }):map("<leader>uL")
         Snacks.toggle.diagnostics():map("<leader>ud")
         Snacks.toggle.line_number():map("<leader>ul")
-        Snacks.toggle.option("conceallevel", { off = 0, on = vim.o.conceallevel > 0 and vim.o.conceallevel or 2 }):map(
-          "<leader>uc"
-        )
+        Snacks.toggle
+          .option("conceallevel", { off = 0, on = vim.o.conceallevel > 0 and vim.o.conceallevel or 2 })
+          :map("<leader>uc")
         Snacks.toggle.treesitter():map("<leader>uT")
         Snacks.toggle.option("background", { off = "light", on = "dark", name = "Dark Background" }):map("<leader>ub")
         Snacks.toggle.inlay_hints():map("<leader>uh")

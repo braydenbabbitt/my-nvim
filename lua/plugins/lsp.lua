@@ -52,7 +52,7 @@ return {
         group = vim.api.nvim_create_augroup("lsp-attach", { clear = true }),
         callback = function(event)
           local map = function(keys, func, desc)
-            vim.keymap.set("n", keys, func, { buffer = event.buf, desc = "LSP: " .. desc })
+            vim.keymap.set("n", keys, func, { buffer = event.buf, desc = "LSP: " .. desc, noremap = true, silent = true })
           end
 
           -- Jump to definition/declaration/references
@@ -116,9 +116,20 @@ return {
       local function root_pattern(...)
         local patterns = { ... }
         return function(fname)
+          -- fname might be a buffer number, convert it to a file path
+          local path = fname
+          if type(fname) == "number" then
+            path = vim.api.nvim_buf_get_name(fname)
+          end
+
+          -- Return nil if path is empty
+          if not path or path == "" then
+            return nil
+          end
+
           local util = vim.fs
           for _, pattern in ipairs(patterns) do
-            local found = util.find(pattern, { path = fname, upward = true })
+            local found = util.find(pattern, { path = path, upward = true })
             if found and #found > 0 then
               return vim.fs.dirname(found[1])
             end
@@ -243,10 +254,35 @@ return {
       vim.api.nvim_create_autocmd("FileType", {
         pattern = { "typescript", "javascript", "typescriptreact", "javascriptreact" },
         callback = function(args)
-          if is_deno_project(args.buf) then
-            vim.lsp.enable("denols")
-          else
-            vim.lsp.enable("vtsls")
+          -- Check if LSP is already attached to avoid duplicate starts
+          local clients = vim.lsp.get_clients({ bufnr = args.buf })
+          for _, client in ipairs(clients) do
+            if client.name == "vtsls" or client.name == "denols" then
+              return -- Already attached
+            end
+          end
+
+          local is_deno = is_deno_project(args.buf)
+          local server = is_deno and "denols" or "vtsls"
+
+          -- Use vim.lsp.start instead of enable for better control
+          local config = vim.lsp.config[server]
+          if not config then
+            vim.notify("No config found for " .. server, vim.log.levels.ERROR)
+            return
+          end
+
+          local ok, client_id = pcall(vim.lsp.start, {
+            name = server,
+            cmd = config.cmd,
+            root_dir = config.root_dir and config.root_dir(vim.api.nvim_buf_get_name(args.buf)),
+            capabilities = config.capabilities,
+            settings = config.settings,
+            init_options = config.init_options,
+          }, { bufnr = args.buf })
+
+          if not ok then
+            vim.notify("Failed to start " .. server .. ": " .. tostring(client_id), vim.log.levels.ERROR)
           end
         end,
       })

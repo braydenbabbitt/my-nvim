@@ -141,6 +141,9 @@ vim.keymap.set("n", "<leader>ww", "<C-W>p", { desc = "Other window", remap = tru
 vim.keymap.set("n", "<leader>wd", "<C-W>c", { desc = "Delete window", remap = true })
 vim.keymap.set("n", "<leader>w-", "<C-W>s", { desc = "Split window below", remap = true })
 vim.keymap.set("n", "<leader>w|", "<C-W>v", { desc = "Split window right", remap = true })
+vim.keymap.set("n", "<leader>-", "<C-W>s", { desc = "Split window below", remap = true })
+vim.keymap.set("n", "<leader>|", "<C-W>v", { desc = "Split window right", remap = true })
+vim.keymap.set("n", "<leader>wo", "<C-W>o", { desc = "Delete other windows", remap = true })
 
 -- Resize windows
 vim.keymap.set("n", "<C-Up>", "<cmd>resize +2<cr>", { desc = "Increase window height" })
