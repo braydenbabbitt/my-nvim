@@ -31,6 +31,7 @@ return {
         "vtsls",
         "eslint",
         "denols",
+        "tailwindcss",
         -- Note: postgres_lsp is not available via mason, install manually if needed
       },
       automatic_installation = true,
@@ -52,7 +53,12 @@ return {
         group = vim.api.nvim_create_augroup("lsp-attach", { clear = true }),
         callback = function(event)
           local map = function(keys, func, desc)
-            vim.keymap.set("n", keys, func, { buffer = event.buf, desc = "LSP: " .. desc, noremap = true, silent = true })
+            vim.keymap.set(
+              "n",
+              keys,
+              func,
+              { buffer = event.buf, desc = "LSP: " .. desc, noremap = true, silent = true }
+            )
           end
 
           -- Jump to definition/declaration/references
@@ -138,7 +144,10 @@ return {
         end
       end
 
-      -- Configure individual language servers using new vim.lsp.config API
+      -- ===================================================================
+      -- SERVER DEFINITIONS
+      -- ===================================================================
+
       -- Lua Language Server
       vim.lsp.config.lua_ls = {
         cmd = { "lua-language-server" },
@@ -194,31 +203,54 @@ return {
         },
       }
 
-      -- ESLint
-      vim.lsp.config.eslint = {
-        cmd = { "vscode-eslint-language-server", "--stdio" },
+      -- ESLint configuration
+      -- Suppress deprecation warning temporarily while lspconfig transitions to vim.lsp.config
+      local original_notify = vim.notify
+      vim.notify = function(msg, level, opts)
+        if not string.match(msg or "", "lspconfig.*deprecated") then
+          original_notify(msg, level, opts)
+        end
+      end
+
+      local lspconfig = require("lspconfig")
+      lspconfig.eslint.setup({
+        capabilities = capabilities,
+        settings = {
+          workingDirectories = { mode = "auto" },
+          packageManager = "pnpm",
+        },
+      })
+
+      -- Restore original notify
+      vim.notify = original_notify
+
+      -- NEW: Tailwind CSS Configuration
+      vim.lsp.config.tailwindcss = {
+        cmd = { "tailwindcss-language-server", "--stdio" },
         filetypes = {
+          "astro",
+          "go",
           "javascript",
           "javascriptreact",
           "typescript",
           "typescriptreact",
+          "react",
           "vue",
           "svelte",
-          "astro",
+          "html",
         },
-        root_dir = root_pattern(
-          ".eslintrc",
-          ".eslintrc.js",
-          ".eslintrc.cjs",
-          ".eslintrc.yaml",
-          ".eslintrc.yml",
-          ".eslintrc.json",
-          "eslint.config.js",
-          "package.json"
-        ),
+        root_dir = root_pattern("tailwind.config.js", "tailwind.config.ts", "package.json"),
         capabilities = capabilities,
         settings = {
-          workingDirectories = { mode = "auto" },
+          tailwindCSS = {
+            experimental = {
+              -- Useful for libraries like cva/class-variance-authority
+              classRegex = {
+                { "cva\\(([^)]*)\\)", "[\"'`]([^\"'`]*).*?[\"'`]" },
+                { "cx\\(([^)]*)\\)", "(?:'|\"|`)([^']*)(?:'|\"|`)" },
+              },
+            },
+          },
         },
       }
 
@@ -230,8 +262,13 @@ return {
         capabilities = capabilities,
       }
 
+      -- ===================================================================
+      -- SERVER STARTUP LOGIC
+      -- ===================================================================
+
       -- Enable LSP servers
       vim.lsp.enable("lua_ls")
+      vim.lsp.enable("postgres_lsp")
 
       -- Only enable one of vtsls or denols based on project type
       -- Check if current buffer's directory has deno markers
@@ -250,45 +287,61 @@ return {
         return false
       end
 
-      -- Create autocmd to conditionally enable vtsls or denols
+      -- REFACTORED: Centralized autocommand for JS/TS projects
       vim.api.nvim_create_autocmd("FileType", {
-        pattern = { "typescript", "javascript", "typescriptreact", "javascriptreact" },
+        pattern = {
+          "javascript",
+          "javascriptreact",
+          "typescript",
+          "typescriptreact",
+          "vue",
+          "svelte",
+          "astro",
+        },
+        group = vim.api.nvim_create_augroup("lsp-attach-js-ts", { clear = true }),
         callback = function(args)
-          -- Check if LSP is already attached to avoid duplicate starts
-          local clients = vim.lsp.get_clients({ bufnr = args.buf })
-          for _, client in ipairs(clients) do
-            if client.name == "vtsls" or client.name == "denols" then
-              return -- Already attached
+          local bufnr = args.buf
+
+          -- Helper to start a server if its root is found
+          local function start_server(server)
+            local config = vim.lsp.config[server]
+            if not config then
+              return
             end
+
+            local root_dir = config.root_dir and config.root_dir(vim.api.nvim_buf_get_name(bufnr))
+            if not root_dir then
+              return
+            end -- Don't start if no project root is found
+
+            -- Prevent starting if already attached for this server name
+            for _, client in ipairs(vim.lsp.get_clients({ bufnr = bufnr })) do
+              if client.name == server then
+                return
+              end
+            end
+
+            pcall(vim.lsp.start, {
+              name = server,
+              cmd = config.cmd,
+              root_dir = root_dir,
+              capabilities = config.capabilities,
+              settings = config.settings,
+              init_options = config.init_options,
+            }, { bufnr = bufnr })
           end
 
-          local is_deno = is_deno_project(args.buf)
-          local server = is_deno and "denols" or "vtsls"
-
-          -- Use vim.lsp.start instead of enable for better control
-          local config = vim.lsp.config[server]
-          if not config then
-            vim.notify("No config found for " .. server, vim.log.levels.ERROR)
-            return
+          -- Conditionally start vtsls or denols
+          if is_deno_project(bufnr) then
+            start_server("denols")
+          else
+            start_server("vtsls")
           end
 
-          local ok, client_id = pcall(vim.lsp.start, {
-            name = server,
-            cmd = config.cmd,
-            root_dir = config.root_dir and config.root_dir(vim.api.nvim_buf_get_name(args.buf)),
-            capabilities = config.capabilities,
-            settings = config.settings,
-            init_options = config.init_options,
-          }, { bufnr = args.buf })
-
-          if not ok then
-            vim.notify("Failed to start " .. server .. ": " .. tostring(client_id), vim.log.levels.ERROR)
-          end
+          -- Always try to start tailwindcss
+          start_server("tailwindcss")
         end,
       })
-
-      vim.lsp.enable("eslint")
-      vim.lsp.enable("postgres_lsp")
     end,
   },
 }
