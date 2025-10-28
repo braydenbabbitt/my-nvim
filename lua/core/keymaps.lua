@@ -60,6 +60,17 @@ vim.keymap.set("n", "<leader>Li", "<cmd>LspInfo<CR>", { desc = "LSP Info", remap
 vim.keymap.set({ "n", "v" }, "<leader>Ll", "<cmd>ToggleLspRoot<CR>", { desc = "Toggle LSP Root Detection", remap = true })
 vim.keymap.set("n", "<leader>gd", "gd", { desc = "Go to Definition", remap = true })
 
+-- Code actions
+vim.keymap.set("n", "<leader>cu", function()
+  vim.lsp.buf.code_action({
+    apply = true,
+    context = {
+      only = { "source.removeUnused" },
+      diagnostics = {},
+    },
+  })
+end, { desc = "Remove unused imports" })
+
 -- Diagnostic keymaps (quickfix/loclist)
 vim.keymap.set("n", "<leader>Xl", function()
   local success, err = pcall(function()

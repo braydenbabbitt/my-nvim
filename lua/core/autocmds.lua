@@ -106,6 +106,3 @@ vim.api.nvim_create_autocmd("FileType", {
     end, 100)
   end,
 })
-
-
-
