@@ -132,17 +132,63 @@ vim.keymap.set("i", "<A-k>", "<esc><cmd>m .-2<cr>==gi", { desc = "Move line up" 
 vim.keymap.set("v", "<A-j>", ":m '>+1<cr>gv=gv", { desc = "Move selection down" })
 vim.keymap.set("v", "<A-k>", ":m '<-2<cr>gv=gv", { desc = "Move selection up" })
 
--- Window navigation
-vim.keymap.set("n", "<C-h>", "<C-w>h", { desc = "Go to left window" })
-vim.keymap.set("n", "<C-j>", "<C-w>j", { desc = "Go to lower window" })
-vim.keymap.set("n", "<C-k>", "<C-w>k", { desc = "Go to upper window" })
-vim.keymap.set("n", "<C-l>", "<C-w>l", { desc = "Go to right window" })
+-- Window navigation (skip floating windows to avoid conflicts with terminal apps)
+vim.keymap.set("n", "<C-h>", function()
+  if vim.api.nvim_win_get_config(0).relative ~= "" then
+    return "<C-h>"
+  end
+  return "<C-w>h"
+end, { expr = true, desc = "Go to left window" })
 
--- Window navigation in terminal mode
-vim.keymap.set("t", "<C-h>", "<cmd>wincmd h<cr>", { desc = "Go to left window" })
-vim.keymap.set("t", "<C-j>", "<cmd>wincmd j<cr>", { desc = "Go to lower window" })
-vim.keymap.set("t", "<C-k>", "<cmd>wincmd k<cr>", { desc = "Go to upper window" })
-vim.keymap.set("t", "<C-l>", "<cmd>wincmd l<cr>", { desc = "Go to right window" })
+vim.keymap.set("n", "<C-j>", function()
+  if vim.api.nvim_win_get_config(0).relative ~= "" then
+    return "<C-j>"
+  end
+  return "<C-w>j"
+end, { expr = true, desc = "Go to lower window" })
+
+vim.keymap.set("n", "<C-k>", function()
+  if vim.api.nvim_win_get_config(0).relative ~= "" then
+    return "<C-k>"
+  end
+  return "<C-w>k"
+end, { expr = true, desc = "Go to upper window" })
+
+vim.keymap.set("n", "<C-l>", function()
+  if vim.api.nvim_win_get_config(0).relative ~= "" then
+    return "<C-l>"
+  end
+  return "<C-w>l"
+end, { expr = true, desc = "Go to right window" })
+
+-- Window navigation in terminal mode (skip floating windows to avoid conflicts)
+vim.keymap.set("t", "<C-h>", function()
+  if vim.api.nvim_win_get_config(0).relative ~= "" then
+    return "<C-h>"
+  end
+  return "<cmd>wincmd h<cr>"
+end, { expr = true, desc = "Go to left window" })
+
+vim.keymap.set("t", "<C-j>", function()
+  if vim.api.nvim_win_get_config(0).relative ~= "" then
+    return "<C-j>"
+  end
+  return "<cmd>wincmd j<cr>"
+end, { expr = true, desc = "Go to lower window" })
+
+vim.keymap.set("t", "<C-k>", function()
+  if vim.api.nvim_win_get_config(0).relative ~= "" then
+    return "<C-k>"
+  end
+  return "<cmd>wincmd k<cr>"
+end, { expr = true, desc = "Go to upper window" })
+
+vim.keymap.set("t", "<C-l>", function()
+  if vim.api.nvim_win_get_config(0).relative ~= "" then
+    return "<C-l>"
+  end
+  return "<cmd>wincmd l<cr>"
+end, { expr = true, desc = "Go to right window" })
 
 -- Terminal mode escape
 vim.keymap.set("t", "<Esc>", "<C-\\><C-n>", { desc = "Exit terminal mode" })
