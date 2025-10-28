@@ -3,6 +3,7 @@
 
 return {
   "akinsho/bufferline.nvim",
+  commit = "655133c",
   event = "VeryLazy",
   keys = {
     { "<leader>bp", "<Cmd>BufferLineTogglePin<CR>", desc = "Toggle pin" },

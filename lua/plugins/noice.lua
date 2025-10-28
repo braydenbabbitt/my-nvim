@@ -3,6 +3,7 @@
 
 return {
   "folke/noice.nvim",
+  commit = "d14d02c",
   event = "VeryLazy",
   dependencies = {
     "MunifTanjim/nui.nvim",
