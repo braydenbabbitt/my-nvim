@@ -211,6 +211,16 @@ vim.keymap.set("n", "<C-Right>", "<cmd>vertical resize +2<cr>", { desc = "Increa
 -- Quit/Save shortcuts
 vim.keymap.set("n", "<leader>qq", "<cmd>qa<cr>", { desc = "Quit all" })
 
+-- Folding keymaps
+vim.keymap.set("n", "<leader>za", "za", { desc = "Toggle fold" })
+vim.keymap.set("n", "<leader>zc", "zc", { desc = "Close fold" })
+vim.keymap.set("n", "<leader>zo", "zo", { desc = "Open fold" })
+vim.keymap.set("n", "<leader>zR", "zR", { desc = "Open all folds" })
+vim.keymap.set("n", "<leader>zM", "zM", { desc = "Close all folds" })
+vim.keymap.set("n", "<leader>zA", "zA", { desc = "Toggle fold recursively" })
+vim.keymap.set("n", "<leader>zC", "zC", { desc = "Close fold recursively" })
+vim.keymap.set("n", "<leader>zO", "zO", { desc = "Open fold recursively" })
+
 -- Debug command to check terminal buffer settings
 vim.api.nvim_create_user_command("TerminalDebug", function()
   local buf = vim.api.nvim_get_current_buf()

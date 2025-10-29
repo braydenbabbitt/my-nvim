@@ -36,6 +36,13 @@ vim.opt.softtabstop = 2 -- Number of spaces for tab in insert mode
 -- Text wrapping settings (disabled by default, enabled for specific filetypes)
 vim.opt.wrap = false -- Disable line wrapping by default
 
+-- Folding settings
+vim.opt.foldmethod = "expr" -- Use expression for folding
+vim.opt.foldexpr = "v:lua.vim.treesitter.foldexpr()" -- Use treesitter for folding
+vim.opt.foldlevel = 99 -- Open all folds by default
+vim.opt.foldlevelstart = 99 -- Start with all folds open
+vim.opt.foldenable = true -- Enable folding
+
 -- LSP root detection configuration
 -- Helper function to check if LSP is in root_spec
 function HasLspInRootSpec()
