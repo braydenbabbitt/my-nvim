@@ -33,6 +33,9 @@ vim.opt.shiftwidth = 2 -- Size of indent
 vim.opt.tabstop = 2 -- Number of spaces tabs count for
 vim.opt.softtabstop = 2 -- Number of spaces for tab in insert mode
 
+-- Text wrapping settings (disabled by default, enabled for specific filetypes)
+vim.opt.wrap = false -- Disable line wrapping by default
+
 -- LSP root detection configuration
 -- Helper function to check if LSP is in root_spec
 function HasLspInRootSpec()

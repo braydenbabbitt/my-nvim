@@ -73,6 +73,16 @@ vim.api.nvim_create_autocmd("BufReadPost", {
   end,
 })
 
+-- Enable text wrapping for markdown and text files
+vim.api.nvim_create_autocmd("FileType", {
+  pattern = { "markdown", "text" },
+  callback = function()
+    vim.opt_local.wrap = true
+    vim.opt_local.linebreak = true -- Break lines at word boundaries
+  end,
+  desc = "Enable text wrapping for markdown and text files",
+})
+
 -- Fix Snacks terminal to allow global :q/:qa commands
 -- Snacks terminal creates buffer-local keymaps and autocmds that intercept quit commands
 vim.api.nvim_create_autocmd("FileType", {
