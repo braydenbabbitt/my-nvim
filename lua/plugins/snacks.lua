@@ -83,6 +83,38 @@ return {
     },
   },
   keys = {
+    -- Terminal (C-/ is sent as C-_ in most terminals)
+    {
+      "<C-/>",
+      function()
+        Snacks.terminal()
+      end,
+      desc = "Toggle Terminal",
+    },
+    {
+      "<C-_>",
+      function()
+        Snacks.terminal()
+      end,
+      desc = "Toggle Terminal",
+    },
+    {
+      "<C-/>",
+      function()
+        Snacks.terminal()
+      end,
+      desc = "Toggle Terminal",
+      mode = "t",
+    },
+    {
+      "<C-_>",
+      function()
+        Snacks.terminal()
+      end,
+      desc = "Toggle Terminal",
+      mode = "t",
+    },
+
     -- Dashboard
     {
       "<leader>.",
