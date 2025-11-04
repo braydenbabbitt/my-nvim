@@ -59,6 +59,9 @@ end, { desc = "Restart LSP (vtsls & eslint)", remap = true })
 vim.keymap.set("n", "<leader>Li", "<cmd>LspInfo<CR>", { desc = "LSP Info", remap = true })
 vim.keymap.set({ "n", "v" }, "<leader>Ll", "<cmd>ToggleLspRoot<CR>", { desc = "Toggle LSP Root Detection", remap = true })
 vim.keymap.set("n", "<leader>gd", "gd", { desc = "Go to Definition", remap = true })
+vim.keymap.set("n", "<leader>gr", function()
+  vim.lsp.buf.references()
+end, { desc = "Go to References", remap = true })
 
 -- Code actions
 vim.keymap.set("n", "<leader>cu", function()
