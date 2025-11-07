@@ -74,6 +74,15 @@ vim.keymap.set("n", "<leader>cu", function()
   })
 end, { desc = "Remove unused imports" })
 
+-- Diagnostic navigation (error-level only)
+vim.keymap.set("n", "]e", function()
+  vim.diagnostic.goto_next({ severity = vim.diagnostic.severity.ERROR })
+end, { desc = "Go to next error" })
+
+vim.keymap.set("n", "[e", function()
+  vim.diagnostic.goto_prev({ severity = vim.diagnostic.severity.ERROR })
+end, { desc = "Go to previous error" })
+
 -- Diagnostic keymaps (quickfix/loclist)
 vim.keymap.set("n", "<leader>Xl", function()
   local success, err = pcall(function()

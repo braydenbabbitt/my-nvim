@@ -34,7 +34,20 @@ return {
       },
       sections = {
         lualine_a = { "mode" },
-        lualine_b = { "branch" },
+        lualine_b = {
+          "branch",
+          -- Macro recording indicator
+          {
+            function()
+              local reg = vim.fn.reg_recording()
+              if reg == "" then
+                return ""
+              end
+              return "recording @" .. reg
+            end,
+            color = { fg = "#ff9e64", gui = "bold" },
+          },
+        },
         lualine_c = {
           {
             "diagnostics",

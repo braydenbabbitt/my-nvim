@@ -4,6 +4,9 @@
 -- Disable snacks animation
 vim.g.snacks_animate = false
 
+-- Disable bracketed paste
+vim.cmd("set t_BE=")
+
 -- Basic editor settings
 vim.opt.number = true -- Show line numbers
 vim.opt.relativenumber = true -- Show relative line numbers
