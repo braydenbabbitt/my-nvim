@@ -2,7 +2,14 @@
 local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
 if not (vim.uv or vim.loop).fs_stat(lazypath) then
   local lazyrepo = "https://github.com/folke/lazy.nvim.git"
-  local out = vim.fn.system({ "git", "clone", "--filter=blob:none", "--branch=stable", lazyrepo, lazypath })
+  local lazytag = "85c7ff3" -- Pin to v11.17.5
+  local out = vim.fn.system({
+    "git",
+    "clone",
+    "--filter=blob:none",
+    lazyrepo,
+    lazypath,
+  })
   if vim.v.shell_error ~= 0 then
     vim.api.nvim_echo({
       { "Failed to clone lazy.nvim:\n", "ErrorMsg" },
@@ -12,6 +19,8 @@ if not (vim.uv or vim.loop).fs_stat(lazypath) then
     vim.fn.getchar()
     os.exit(1)
   end
+  -- Checkout the pinned commit
+  vim.fn.system({ "git", "-C", lazypath, "checkout", lazytag })
 end
 vim.opt.rtp:prepend(lazypath)
 

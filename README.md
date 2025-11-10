@@ -4,7 +4,9 @@ A standalone, custom Neovim configuration built from scratch (migrated from Lazy
 
 ## Philosophy
 
-This config is **fully independent** - no LazyVim dependency, no version pinning issues, and complete control over every plugin and keymap. It maintains the best parts of LazyVim (plugin selection, UI/UX) while eliminating the complexity and friction of fighting with defaults.
+This config is **fully independent** - no LazyVim dependency, complete control over every plugin and keymap. It maintains the best parts of LazyVim (plugin selection, UI/UX) while eliminating the complexity and friction of fighting with defaults.
+
+**All plugins are pinned to specific commits** for maximum stability and reproducibility, preventing unexpected breaking changes from upstream updates.
 
 ## Structure
 
@@ -16,16 +18,20 @@ This config is **fully independent** - no LazyVim dependency, no version pinning
 │   │   ├── options.lua     # Vim options and settings
 │   │   ├── keymaps.lua     # All custom keybindings
 │   │   └── autocmds.lua    # Autocommands
-│   └── plugins/            # Plugin specifications
+│   └── plugins/            # Plugin specifications (all pinned to specific commits)
+│       ├── autotag.lua     # Auto-close and rename HTML/JSX tags
 │       ├── blink.lua       # Completion engine
+│       ├── bufferline.lua  # Buffer tabs with diagnostics
 │       ├── cloak.lua       # Hide sensitive info
 │       ├── colorscheme.lua # Color schemes (vscode, tokyonight, catppuccin)
 │       ├── conform.lua     # Code formatting
 │       ├── editor.lua      # Editor enhancements (pairs, surround, comment, etc.)
 │       ├── git.lua         # Git integration (gitsigns)
+│       ├── grug-far.lua    # Find and replace across files
 │       ├── lsp.lua         # LSP configuration (vtsls, denols, eslint, etc.)
 │       ├── lualine.lua     # Statusline
 │       ├── luasnip.lua     # Snippet engine
+│       ├── noice.lua       # Enhanced UI for messages and cmdline
 │       ├── snacks.lua      # Utilities (dashboard, terminal, picker, etc.)
 │       ├── telescope.lua   # Fuzzy finder
 │       ├── todo-comments.lua # TODO highlighting
@@ -39,6 +45,7 @@ This config is **fully independent** - no LazyVim dependency, no version pinning
 
 ### Language Support
 - **TypeScript/JavaScript**: vtsls LSP with prettier formatting and ESLint auto-fix on save
+- **HTML/JSX/TSX**: Auto-close and auto-rename tags via nvim-ts-autotag
 - **Deno**: Separate LSP for Deno projects (auto-detected via deno.json)
 - **Lua**: Full Neovim Lua support with lua_ls
 - **SQL**: PostgreSQL LSP support
@@ -47,8 +54,11 @@ This config is **fully independent** - no LazyVim dependency, no version pinning
 ### UI/UX
 - **Dashboard**: Custom Neovim ASCII art on startup
 - **Statusline**: Custom lualine with 12-hour clock
+- **Buffer Tabs**: Bufferline with diagnostics integration and pinning support
+- **Enhanced UI**: Noice for floating command palette and improved LSP hover/signature help
 - **File Explorer**: Snacks picker with git status integration
 - **Fuzzy Finder**: Telescope for files, grep, buffers, etc.
+- **Search & Replace**: Grug-far for project-wide find and replace with nice UI
 - **Colorscheme**: VSCode theme (default), with Tokyo Night and Catppuccin available
 
 ### Custom Keybindings
@@ -58,7 +68,25 @@ This config is **fully independent** - no LazyVim dependency, no version pinning
 - `<leader>aa` = Open Claude terminal (right side)
 - `<leader>R` = Reset all windows and buffers
 - `gg`/`G` = Jump to start/end of file with cursor at line start/end
-- See `lua/core/keymaps.lua` for full list
+
+#### Buffer Management
+- `[b`/`]b` = Previous/next buffer
+- `<leader>bp` = Toggle pin buffer
+- `<leader>bP` = Delete non-pinned buffers
+- `<leader>bo` = Delete other buffers
+- `<leader>br`/`<leader>bl` = Delete buffers to the right/left
+
+#### Noice (Enhanced UI)
+- `<leader>nl` = Show last message
+- `<leader>nh` = Show message history
+- `<leader>na` = Show all messages
+- `<leader>nd` = Dismiss all notifications
+- `<C-f>`/`<C-b>` = Scroll LSP hover/signature help
+
+#### Search & Replace
+- `<leader>sr` = Open grug-far for project-wide search and replace
+
+See `lua/core/keymaps.lua` for full list
 
 ### LSP Features
 - Auto-completion via blink.cmp
@@ -83,12 +111,13 @@ This config uses lazy.nvim and will auto-install on first launch.
 ## Customization
 
 ### Adding Plugins
-Create a new file in `lua/plugins/` with your plugin spec:
+Create a new file in `lua/plugins/` with your plugin spec. **Always pin to a specific commit**:
 
 ```lua
 -- lua/plugins/my-plugin.lua
 return {
   "username/plugin-name",
+  commit = "abc1234",  -- Always pin to a specific commit
   opts = {
     -- options here
   },
@@ -115,7 +144,7 @@ Edit `lua/plugins/lsp.lua`:
 This config was migrated from LazyVim v14.15.1. All LazyVim-specific code has been removed and replaced with direct plugin configurations. Key differences:
 
 - **No LazyVim dependency**: Completely standalone
-- **No version pinning**: Uses latest commits (or specified versions)
+- **Commit pinning**: All plugins pinned to specific commits for stability
 - **Explicit configs**: Every plugin is explicitly configured, no hidden defaults
 - **No extras system**: Plugins are manually specified instead of using LazyVim extras
 - **Custom keymaps**: All keymaps defined in one place, no need to delete LazyVim defaults
