@@ -57,7 +57,12 @@ vim.keymap.set("n", "<leader>Lrt", function()
 end, { desc = "Restart LSP (vtsls & eslint)", remap = true })
 
 vim.keymap.set("n", "<leader>Li", "<cmd>LspInfo<CR>", { desc = "LSP Info", remap = true })
-vim.keymap.set({ "n", "v" }, "<leader>Ll", "<cmd>ToggleLspRoot<CR>", { desc = "Toggle LSP Root Detection", remap = true })
+vim.keymap.set(
+  { "n", "v" },
+  "<leader>Ll",
+  "<cmd>ToggleLspRoot<CR>",
+  { desc = "Toggle LSP Root Detection", remap = true }
+)
 vim.keymap.set("n", "<leader>gd", "gd", { desc = "Go to Definition", remap = true })
 vim.keymap.set("n", "<leader>gr", function()
   vim.lsp.buf.references()
@@ -110,16 +115,30 @@ vim.keymap.set("n", "<leader>Xq", function()
   end
 end, { desc = "Toggle Quickfix List" })
 
+vim.keymap.set("n", "<leader>alg", function()
+  vim.g.aicli = "gemini"
+end, { desc = "Switch AI CLI tool to Gemini CLI" })
+
+vim.keymap.set("", "<leader>alc", function()
+  vim.g.aicli = "claude"
+end, { desc = "Switch AI CLI tool to Claude Code" })
+
+local get_ai_terminal_name = function()
+  return vim.g.aicli
+end
+
 -- Claude terminal keymaps (requires Snacks.nvim)
 vim.keymap.set("n", "<leader>aa", function()
+  local terminal_name = get_ai_terminal_name()
   if Snacks then
-    Snacks.terminal("claude", { win = { position = "right" } })
+    Snacks.terminal(terminal_name, { win = { position = "right" } })
   end
 end, { desc = "Open Claude in right terminal" })
 
 vim.keymap.set("n", "<leader>at", function()
+  local terminal_name = get_ai_terminal_name()
   if Snacks then
-    Snacks.terminal.toggle("claude", { win = { position = "right" } })
+    Snacks.terminal.toggle(terminal_name, { win = { position = "right" } })
   end
 end, { desc = "Toggle Claude terminal" })
 
