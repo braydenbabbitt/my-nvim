@@ -44,17 +44,47 @@ vim.keymap.set("n", "<leader>R", function()
 end, { desc = "Reset Windows and Buffers", remap = true })
 
 -- LSP keymaps
-vim.keymap.set("n", "<leader>Lrt", function()
-  local servers = { "vtsls", "eslint" }
-  for _, name in ipairs(servers) do
-    for _, client in pairs(vim.lsp.get_clients({ name = name })) do
-      client:stop()
-    end
-    vim.defer_fn(function()
-      vim.cmd("LspStart " .. name)
-    end, 3000)
+vim.keymap.set("n", "<leader>lr", function()
+  local buf = vim.api.nvim_get_current_buf()
+  local clients = vim.lsp.get_clients({ bufnr = buf })
+
+  if #clients == 0 then
+    vim.notify("No active LSP clients for current buffer", vim.log.levels.WARN)
+    return
   end
-end, { desc = "Restart LSP (vtsls & eslint)", remap = true })
+
+  local client_names = {}
+  for _, client in ipairs(clients) do
+    table.insert(client_names, client.name)
+  end
+
+  vim.notify("Stopping LSP clients: " .. table.concat(client_names, ", "), vim.log.levels.INFO)
+
+  -- Stop all clients and collect their IDs
+  local client_ids = {}
+  for _, client in ipairs(clients) do
+    table.insert(client_ids, client.id)
+    client:stop()
+  end
+
+  -- Poll until all clients are actually stopped
+  local function wait_for_stop()
+    for _, id in ipairs(client_ids) do
+      local client = vim.lsp.get_client_by_id(id)
+      if client then
+        -- Client still exists, keep waiting
+        vim.defer_fn(wait_for_stop, 100)
+        return
+      end
+    end
+    -- All clients stopped, now restart
+    vim.notify("Restarting LSP clients...", vim.log.levels.INFO)
+    vim.cmd("edit")
+  end
+
+  -- Start polling after a short delay
+  vim.defer_fn(wait_for_stop, 100)
+end, { desc = "Restart LSPs for current buffer", remap = true })
 
 vim.keymap.set("n", "<leader>Li", "<cmd>LspInfo<CR>", { desc = "LSP Info", remap = true })
 vim.keymap.set(
