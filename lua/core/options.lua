@@ -46,8 +46,9 @@ vim.opt.foldlevel = 99 -- Open all folds by default
 vim.opt.foldlevelstart = 99 -- Start with all folds open
 vim.opt.foldenable = true -- Enable folding
 
--- AI settings
-vim.g.aicli = "claude"
+-- AI CLI initialization (load saved preference)
+local aicli = require("core.aicli")
+vim.g.aicli = aicli.get_current_tool()
 
 -- LSP root detection configuration
 -- Helper function to check if LSP is in root_spec

@@ -145,32 +145,45 @@ vim.keymap.set("n", "<leader>Xq", function()
   end
 end, { desc = "Toggle Quickfix List" })
 
+-- AI CLI selection and terminal
+local aicli = require("core.aicli")
+
+-- Interactive selection menu
+vim.keymap.set("n", "<leader>als", function()
+  aicli.show_selection_menu()
+end, { desc = "Select AI CLI tool" })
+
+-- Quick-switch keymaps (power user shortcuts)
+vim.keymap.set("n", "<leader>alc", function()
+  aicli.set_current_tool("claude")
+end, { desc = "Switch to Claude Code" })
+
 vim.keymap.set("n", "<leader>alg", function()
-  vim.g.aicli = "gemini"
-end, { desc = "Switch AI CLI tool to Gemini CLI" })
+  aicli.set_current_tool("gemini")
+end, { desc = "Switch to Gemini CLI" })
 
-vim.keymap.set("", "<leader>alc", function()
-  vim.g.aicli = "claude"
-end, { desc = "Switch AI CLI tool to Claude Code" })
+vim.keymap.set("n", "<leader>alh", function()
+  aicli.set_current_tool("copilot")
+end, { desc = "Switch to GitHub Copilot" })
 
-local get_ai_terminal_name = function()
-  return vim.g.aicli
+-- Terminal keymaps (use current selected tool)
+local function get_ai_terminal_name()
+  return aicli.get_terminal_command()
 end
 
--- Claude terminal keymaps (requires Snacks.nvim)
 vim.keymap.set("n", "<leader>aa", function()
   local terminal_name = get_ai_terminal_name()
   if Snacks then
     Snacks.terminal(terminal_name, { win = { position = "right" } })
   end
-end, { desc = "Open Claude in right terminal" })
+end, { desc = "Open AI terminal" })
 
 vim.keymap.set("n", "<leader>at", function()
   local terminal_name = get_ai_terminal_name()
   if Snacks then
     Snacks.terminal.toggle(terminal_name, { win = { position = "right" } })
   end
-end, { desc = "Toggle Claude terminal" })
+end, { desc = "Toggle AI terminal" })
 
 -- Buffer navigation
 vim.keymap.set("n", "<S-h>", "<cmd>bprevious<cr>", { desc = "Previous buffer" })

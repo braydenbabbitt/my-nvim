@@ -86,6 +86,7 @@ return {
     spec = {
       -- Group descriptions
       { "<leader>a", group = "AI/Assistant", icon = "󰚩" },
+      { "<leader>al", group = "Switch AI CLI", icon = "" },
       { "<leader>b", group = "Buffer", icon = "󰓩" },
       { "<leader>c", group = "Code", icon = "" },
       { "<leader>d", desc = "Blackhole Register Delete" },
@@ -104,6 +105,36 @@ return {
       { "<leader>X", group = "Diagnostics/Quickfix", icon = "󱖫" },
     },
   },
+  config = function(_, opts)
+    local wk = require("which-key")
+    wk.setup(opts)
+
+    -- Dynamic AI CLI descriptions
+    local function update_ai_descriptions()
+      local ok, aicli = pcall(require, "core.aicli")
+      if not ok then
+        return
+      end
+
+      local current = aicli.get_current_tool()
+      local tool = aicli.get_tool_info(current)
+
+      wk.add({
+        { "<leader>aa", desc = "Open " .. tool.display_name },
+        { "<leader>at", desc = "Toggle " .. tool.display_name },
+        { "<leader>als", desc = "Select AI CLI (current: " .. tool.display_name .. ")" },
+      })
+    end
+
+    -- Update on startup
+    vim.schedule(update_ai_descriptions)
+
+    -- Update when tool changes
+    vim.api.nvim_create_autocmd("User", {
+      pattern = "AICliToolChanged",
+      callback = update_ai_descriptions,
+    })
+  end,
   keys = {
     {
       "<leader>?",
