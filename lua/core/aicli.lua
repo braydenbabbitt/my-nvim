@@ -6,12 +6,18 @@ local M = {}
 -- CLI Tools Registry
 -- Each tool definition includes metadata, installation info, and detection logic
 local CLI_TOOLS = {
+  opencode = {
+    name = "OpenCode",
+    display_name = "OpenCode",
+    executable = "opencode",
+    install_cmd = "npm install -g opencode-ai",
+    description = "OpenCode AI assistant",
+  },
   claude = {
     name = "Claude Code",
     display_name = "Claude Code",
     executable = "claude",
     install_cmd = "npm install -g @anthropic-ai/claude-cli",
-    icon = "󰚩",
     description = "Anthropic's Claude AI assistant",
   },
   gemini = {
@@ -19,7 +25,6 @@ local CLI_TOOLS = {
     display_name = "Gemini CLI",
     executable = "gemini",
     install_cmd = "npm i -g @google/gemini-cli",
-    icon = "",
     description = "Google's Gemini AI assistant",
   },
   copilot = {
@@ -36,7 +41,6 @@ local CLI_TOOLS = {
     end,
     install_cmd = "gh extension install github/gh-copilot",
     terminal_cmd = "gh copilot",
-    icon = "",
     description = "GitHub's Copilot assistant",
   },
 }
@@ -49,7 +53,7 @@ local STATE_FILE = vim.fn.stdpath("data") .. "/aicli.json"
 local function load_state()
   local file = io.open(STATE_FILE, "r")
   if not file then
-    return { selected_tool = "claude" }
+    return { selected_tool = "opencode" }
   end
 
   local content = file:read("*a")
@@ -58,16 +62,16 @@ local function load_state()
   local ok, state = pcall(vim.json.decode, content)
   if not ok or not state or not state.selected_tool then
     vim.notify("AI CLI state file corrupted, using defaults", vim.log.levels.WARN)
-    return { selected_tool = "claude" }
+    return { selected_tool = "opencode" }
   end
 
   -- Validate that selected_tool exists in CLI_TOOLS
   if not CLI_TOOLS[state.selected_tool] then
     vim.notify(
-      string.format("Unknown AI CLI tool '%s', defaulting to claude", state.selected_tool),
+      string.format("Unknown AI CLI tool '%s', defaulting to opencode", state.selected_tool),
       vim.log.levels.WARN
     )
-    return { selected_tool = "claude" }
+    return { selected_tool = "opencode" }
   end
 
   return state
@@ -131,7 +135,7 @@ function M.get_terminal_command()
   local tool_id = M.get_current_tool()
   local tool = CLI_TOOLS[tool_id]
   if not tool then
-    return "claude" -- fallback
+    return "opencode" -- fallback
   end
   return tool.terminal_cmd or tool_id
 end
@@ -245,7 +249,7 @@ end
 -- Displays all tools with installation status (✓/✗)
 function M.show_selection_menu()
   -- Define a consistent order for tools
-  local tool_order = { "claude", "gemini", "copilot" }
+  local tool_order = { "opencode", "claude", "gemini", "copilot" }
 
   local items = {}
   local tool_ids = {}
