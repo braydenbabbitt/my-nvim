@@ -171,19 +171,19 @@ local function get_ai_terminal_name()
   return aicli.get_terminal_command()
 end
 
-vim.keymap.set("n", "<leader>aa", function()
-  local terminal_name = get_ai_terminal_name()
-  if Snacks then
-    Snacks.terminal(terminal_name, { win = { position = "right" } })
-  end
-end, { desc = "Open AI terminal" })
-
-vim.keymap.set("n", "<leader>at", function()
-  local terminal_name = get_ai_terminal_name()
-  if Snacks then
-    Snacks.terminal.toggle(terminal_name, { win = { position = "right" } })
-  end
-end, { desc = "Toggle AI terminal" })
+-- vim.keymap.set("n", "<leader>aa", function()
+--   local terminal_name = get_ai_terminal_name()
+--   if Snacks then
+--     Snacks.terminal(terminal_name, { win = { position = "right" } })
+--   end
+-- end, { desc = "Open AI terminal" })
+--
+-- vim.keymap.set("n", "<leader>at", function()
+--   local terminal_name = get_ai_terminal_name()
+--   if Snacks then
+--     Snacks.terminal.toggle(terminal_name, { win = { position = "right" } })
+--   end
+-- end, { desc = "Toggle AI terminal" })
 
 -- Buffer navigation
 vim.keymap.set("n", "<S-h>", "<cmd>bprevious<cr>", { desc = "Previous buffer" })

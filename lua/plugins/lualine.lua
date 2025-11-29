@@ -117,10 +117,14 @@ return {
           { "location", padding = { left = 0, right = 1 } },
         },
         lualine_z = {
-          -- 12-hour clock format
-          function()
-            return " " .. os.date("%I:%M %p")
-          end,
+          {
+            function()
+              return " " .. os.date("%I:%M %p")
+            end,
+          },
+          {
+            require("opencode").statusline,
+          },
         },
       },
       extensions = { "lazy", "mason" },
