@@ -113,6 +113,9 @@ vim.api.nvim_create_autocmd("FileType", {
 
       -- Remove the buffer-local 'q' keymap that hides the terminal
       pcall(vim.keymap.del, "n", "q", { buffer = event.buf })
+
+      -- Set a new 'q' keymap that just closes the terminal window
+      vim.keymap.set("n", "q", "<cmd>close<cr>", { buffer = event.buf, silent = true, desc = "Close terminal window" })
     end, 100)
   end,
 })
