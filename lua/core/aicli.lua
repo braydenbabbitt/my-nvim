@@ -19,6 +19,8 @@ local CLI_TOOLS = {
     executable = "claude",
     install_cmd = "npm install -g @anthropic-ai/claude-cli",
     description = "Anthropic's Claude AI assistant",
+    -- Disable bracketed paste mode to prevent paste corruption in nvim terminals
+    terminal_cmd = "printf '\\e[?2004l' && claude",
   },
   gemini = {
     name = "Gemini CLI",
