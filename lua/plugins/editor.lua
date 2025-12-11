@@ -64,24 +64,6 @@ return {
     end,
   },
 
-  -- Better escape
-  {
-    "max397574/better-escape.nvim",
-    commit = "19a38aa",
-    event = "InsertEnter",
-    opts = {
-      timeout = 200,
-      mappings = {
-        i = {
-          j = {
-            k = "<Esc>",
-            j = "<Esc>",
-          },
-        },
-      },
-    },
-  },
-
   -- Indent guides
   {
     "lukas-reineke/indent-blankline.nvim",
