@@ -1,0 +1,105 @@
+name: Tests
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  schedule:
+    # Run tests every Monday at 9 AM UTC
+    - cron: "0 9 * * 1"
+
+jobs:
+  test:
+    name: Run Tests
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+        nvim-version: [stable, nightly]
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install Neovim (Ubuntu)
+        if: runner.os == 'Linux'
+        run: |
+          if [ "${{ matrix.nvim-version }}" == "stable" ]; then
+            wget https://github.com/neovim/neovim/releases/download/stable/nvim-linux64.tar.gz
+            tar xzf nvim-linux64.tar.gz
+            echo "$PWD/nvim-linux64/bin" >> $GITHUB_PATH
+          else
+            wget https://github.com/neovim/neovim/releases/download/nightly/nvim-linux64.tar.gz
+            tar xzf nvim-linux64.tar.gz
+            echo "$PWD/nvim-linux64/bin" >> $GITHUB_PATH
+          fi
+
+      - name: Install Neovim (macOS)
+        if: runner.os == 'macOS'
+        run: |
+          if [ "${{ matrix.nvim-version }}" == "stable" ]; then
+            brew install neovim
+          else
+            brew install --HEAD neovim
+          fi
+
+      - name: Verify Neovim installation
+        run: nvim --version
+
+      - name: Install lazy.nvim and plenary.nvim
+        run: |
+          nvim --headless --noplugin -u tests/minimal_init.lua \
+            -c "lua require('lazy').sync({ wait = true })" \
+            -c "quitall"
+
+      - name: Run tests
+        run: make test
+
+      - name: Run plugin pin validation
+        run: make test-plugins
+
+      - name: Upload test results
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results-${{ matrix.os }}-${{ matrix.nvim-version }}
+          path: |
+            **/*.log
+            **/*.err
+
+  lint:
+    name: Lint
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install Luacheck
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y luarocks
+          sudo luarocks install luacheck
+
+      - name: Run Luacheck
+        run: make lint
+
+  format:
+    name: Format Check
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install Stylua
+        run: |
+          wget https://github.com/JohnnyMorganz/StyLua/releases/latest/download/stylua-linux-x86_64.zip
+          unzip stylua-linux-x86_64.zip
+          chmod +x stylua
+          sudo mv stylua /usr/local/bin/
+
+      - name: Check formatting
+        run: make format-check

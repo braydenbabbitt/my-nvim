@@ -139,6 +139,135 @@ Edit `lua/plugins/lsp.lua`:
 2. Add server config to the `servers` table
 3. Restart Neovim
 
+## Testing
+
+This config includes comprehensive automated tests to ensure stability and catch regressions early.
+
+### Testing Strategy
+
+The test suite uses **plenary.nvim** (industry standard for Neovim testing) and covers:
+
+1. **Core Module Tests**: All custom Lua logic in `lua/core/` (aicli, options, keymaps, autocmds)
+2. **Plugin Pin Validation**: Ensures all 18 plugin files remain pinned to specific commits
+3. **Integration Tests**: Plugin loading and LSP configuration validation
+4. **CI/CD**: Automated testing on every push/PR via GitHub Actions
+
+**Current Status**: 58/58 plugin validation tests passing ✅
+
+### Running Tests
+
+```bash
+# Run all tests
+make test
+
+# Run specific test suites
+make test-core         # Core module tests only
+make test-plugins      # Plugin pin validation (ensures no unpinned plugins)
+make test-integration  # Integration tests
+
+# Development
+make test-watch        # Watch mode (requires entr)
+
+# Code quality
+make lint              # Run luacheck
+make format            # Format with stylua
+make format-check      # Check formatting without modifying
+```
+
+### What's Being Tested
+
+- **AI CLI Module** (`core/aicli.lua`): State persistence, tool detection, installation logic
+- **Options Module** (`core/options.lua`): LSP root detection, vim settings
+- **Keymaps Module** (`core/keymaps.lua`): Keymap creation and configuration
+- **Autocmds Module** (`core/autocmds.lua`): Autocommand setup and behavior
+- **Plugin Pinning**: All plugins have `commit = "abc1234"` fields (no branch/tag/version)
+- **Plugin Loading**: All plugin specs can be loaded without errors
+
+### Adding Tests for New Plugins
+
+When you add a new plugin, the **pin validation tests automatically verify** it's properly pinned. No additional test code needed!
+
+However, if you add **custom logic** (functions, utilities, complex configs), add corresponding tests:
+
+#### 1. Create a test file
+
+```bash
+# For core modules
+touch tests/core/my_module_spec.lua
+
+# For plugin-specific tests
+touch tests/integration/my_plugin_spec.lua
+```
+
+#### 2. Write tests using plenary's busted syntax
+
+```lua
+local helpers = require("tests.helpers")
+
+describe("my_module", function()
+  before_each(function()
+    helpers.setup()  -- Reset state before each test
+  end)
+
+  after_each(function()
+    helpers.teardown()
+  end)
+
+  describe("my_function", function()
+    it("should do something", function()
+      -- Arrange
+      local input = "test"
+
+      -- Act
+      local result = require("my_module").my_function(input)
+
+      -- Assert
+      assert.are.equal("expected", result)
+    end)
+  end)
+end)
+```
+
+#### 3. Use mocking utilities when needed
+
+```lua
+local mock = require("tests.helpers.mock")
+
+-- Mock file I/O
+local file_io = mock.mock_file_io()
+file_io.files["/path/to/file"] = "content"
+-- ... test code ...
+file_io.restore()
+
+-- Mock vim.fn.executable
+local exec_mock = mock.mock_executable({ git = true, node = false })
+-- ... test code ...
+exec_mock.restore()
+
+-- Mock vim.notify
+local notify_mock = mock.mock_notify()
+-- ... test code ...
+helpers.assert.assert_notified(notify_mock.notifications, "message", vim.log.levels.INFO)
+notify_mock.restore()
+```
+
+#### 4. Run your new tests
+
+```bash
+make test-core  # or make test-integration
+```
+
+### CI/CD Integration
+
+Tests run automatically via GitHub Actions on:
+- Every push to `main`
+- Every pull request
+- Weekly schedule (Mondays at 9 AM UTC)
+
+Tests run on both **Ubuntu** and **macOS** with **Neovim stable** and **nightly**.
+
+See `tests/README.md` for detailed testing documentation and best practices.
+
 ## Migration Notes
 
 This config was migrated from LazyVim v14.15.1. All LazyVim-specific code has been removed and replaced with direct plugin configurations. Key differences:
