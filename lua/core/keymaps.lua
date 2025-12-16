@@ -186,10 +186,10 @@ vim.keymap.set("n", "<leader>at", function()
 end, { desc = "Toggle AI terminal" })
 
 -- Buffer navigation
-vim.keymap.set("n", "<S-h>", "<cmd>bprevious<cr>", { desc = "Previous buffer" })
-vim.keymap.set("n", "<S-l>", "<cmd>bnext<cr>", { desc = "Next buffer" })
-vim.keymap.set("n", "[b", "<cmd>bprevious<cr>", { desc = "Previous buffer" })
-vim.keymap.set("n", "]b", "<cmd>bnext<cr>", { desc = "Next buffer" })
+vim.keymap.set("n", "<S-h>", "<cmd>keepjumps bprevious<cr>", { desc = "Previous buffer" })
+vim.keymap.set("n", "<S-l>", "<cmd>keepjumps bnext<cr>", { desc = "Next buffer" })
+vim.keymap.set("n", "[b", "<cmd>keepjumps bprevious<cr>", { desc = "Previous buffer" })
+vim.keymap.set("n", "]b", "<cmd>keepjumps bnext<cr>", { desc = "Next buffer" })
 
 -- Clear search highlight
 vim.keymap.set("n", "<Esc>", "<cmd>nohlsearch<CR>", { desc = "Clear search highlight" })
