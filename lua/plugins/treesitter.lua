@@ -3,18 +3,17 @@
 
 return {
   "nvim-treesitter/nvim-treesitter",
-  commit = "42fc28b",
   build = ":TSUpdate",
   event = { "BufReadPost", "BufNewFile" },
-  dependencies = {
-    { "nvim-treesitter/nvim-treesitter-textobjects", commit = "71385f1" },
-  },
   cmd = { "TSUpdateSync", "TSUpdate", "TSInstall" },
   keys = {
     { "<c-space>", desc = "Increment Selection" },
     { "<bs>", desc = "Decrement Selection", mode = "x" },
   },
   opts = {
+    -- Note: install_dir is handled by the plugin itself in lazy.nvim setup
+    -- Parsers are installed in the plugin's parser directory
+    
     ensure_installed = {
       "bash",
       "c",
@@ -41,13 +40,8 @@ return {
       "yaml",
     },
     auto_install = true,
-    highlight = {
-      enable = true,
-      additional_vim_regex_highlighting = false,
-    },
-    indent = {
-      enable = true,
-    },
+    
+    -- Incremental selection (still supported in 1.0)
     incremental_selection = {
       enable = true,
       keymaps = {
@@ -57,46 +51,17 @@ return {
         node_decremental = "<bs>",
       },
     },
-    textobjects = {
-      select = {
-        enable = true,
-        lookahead = true,
-        keymaps = {
-          ["af"] = "@function.outer",
-          ["if"] = "@function.inner",
-          ["ac"] = "@class.outer",
-          ["ic"] = "@class.inner",
-          ["aa"] = "@parameter.outer",
-          ["ia"] = "@parameter.inner",
-        },
-      },
-      move = {
-        enable = true,
-        set_jumps = true,
-        goto_next_start = {
-          ["]f"] = "@function.outer",
-          ["]c"] = "@class.outer",
-          ["]a"] = "@parameter.inner",
-        },
-        goto_next_end = {
-          ["]F"] = "@function.outer",
-          ["]C"] = "@class.outer",
-          ["]A"] = "@parameter.inner",
-        },
-        goto_previous_start = {
-          ["[f"] = "@function.outer",
-          ["[c"] = "@class.outer",
-          ["[a"] = "@parameter.inner",
-        },
-        goto_previous_end = {
-          ["[F"] = "@function.outer",
-          ["[C"] = "@class.outer",
-          ["[A"] = "@parameter.inner",
-        },
-      },
-    },
   },
   config = function(_, opts)
-    require("nvim-treesitter.configs").setup(opts)
+    -- Prepend nvim-treesitter runtime to runtimepath for query priority
+    local runtime_path = vim.fn.stdpath("data") .. "/lazy/nvim-treesitter/runtime"
+    vim.opt.runtimepath:prepend(runtime_path)
+    
+    -- Add parser directory to treesitter parser search path
+    local parser_install_dir = vim.fn.stdpath("data") .. "/lazy/nvim-treesitter"
+    vim.opt.runtimepath:append(parser_install_dir)
+    
+    -- New API: require('nvim-treesitter').setup() instead of .configs
+    require("nvim-treesitter").setup(opts)
   end,
 }

@@ -41,7 +41,7 @@ vim.opt.wrap = false -- Disable line wrapping by default
 
 -- Folding settings
 vim.opt.foldmethod = "expr" -- Use expression for folding
-vim.opt.foldexpr = "v:lua.vim.treesitter.foldexpr()" -- Use treesitter for folding
+-- vim.opt.foldexpr = "v:lua.vim.treesitter.foldexpr()" -- Moved to per-filetype autocmd
 vim.opt.foldlevel = 99 -- Open all folds by default
 vim.opt.foldlevelstart = 99 -- Start with all folds open
 vim.opt.foldenable = true -- Enable folding

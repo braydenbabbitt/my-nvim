@@ -119,3 +119,25 @@ vim.api.nvim_create_autocmd("FileType", {
     end, 100)
   end,
 })
+
+-- Enable treesitter-based features for all supported filetypes
+vim.api.nvim_create_autocmd("FileType", {
+  pattern = {
+    "bash", "c", "cpp", "css", "diff", "go", "html", "java",
+    "javascript", "json", "jsonc", "lua", "markdown", "python",
+    "query", "regex", "rust", "toml", "tsx", "typescript", "vim",
+    "vimdoc", "xml", "yaml",
+  },
+  callback = function()
+    -- Enable treesitter highlighting
+    vim.treesitter.start()
+    
+    -- Enable treesitter-based folding
+    vim.wo[0][0].foldmethod = "expr"
+    vim.wo[0][0].foldexpr = "v:lua.vim.treesitter.foldexpr()"
+    
+    -- Enable treesitter-based indentation (experimental)
+    vim.bo.indentexpr = "v:lua.require'nvim-treesitter'.indentexpr()"
+  end,
+  desc = "Enable treesitter features for supported languages",
+})
