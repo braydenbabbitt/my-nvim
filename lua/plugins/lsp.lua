@@ -32,6 +32,7 @@ return {
         "eslint",
         "denols",
         "tailwindcss",
+        "basedpyright",
         -- Note: postgres_lsp is not available via mason, install manually if needed
       },
       automatic_installation = true,
@@ -262,6 +263,32 @@ return {
         capabilities = capabilities,
       }
 
+      -- Python (basedpyright)
+      vim.lsp.config.basedpyright = {
+        cmd = { "basedpyright-langserver", "--stdio" },
+        filetypes = { "python" },
+        root_dir = root_pattern(
+          "pyproject.toml",
+          "setup.py",
+          "setup.cfg",
+          "requirements.txt",
+          "Pipfile",
+          "pyrightconfig.json",
+          ".git"
+        ),
+        single_file_support = true,
+        capabilities = capabilities,
+        settings = {
+          basedpyright = {
+            analysis = {
+              autoSearchPaths = true,
+              diagnosticMode = "openFilesOnly",
+              useLibraryCodeForTypes = true,
+            },
+          },
+        },
+      }
+
       -- ===================================================================
       -- SERVER STARTUP LOGIC
       -- ===================================================================
@@ -269,6 +296,7 @@ return {
       -- Enable LSP servers
       vim.lsp.enable("lua_ls")
       vim.lsp.enable("postgres_lsp")
+      vim.lsp.enable("basedpyright")
 
       -- Only enable one of vtsls or denols based on project type
       -- Check if current buffer's directory has deno markers
@@ -340,6 +368,46 @@ return {
 
           -- Always try to start tailwindcss
           start_server("tailwindcss")
+        end,
+      })
+
+      -- Python LSP autocommand
+      vim.api.nvim_create_autocmd("FileType", {
+        pattern = { "python" },
+        group = vim.api.nvim_create_augroup("lsp-attach-python", { clear = true }),
+        callback = function(args)
+          local bufnr = args.buf
+          local config = vim.lsp.config.basedpyright
+          if not config then
+            return
+          end
+
+          local fname = vim.api.nvim_buf_get_name(bufnr)
+          local root_dir = config.root_dir and config.root_dir(fname)
+
+          -- For single file support, use file's directory if no root found
+          if not root_dir and config.single_file_support then
+            root_dir = vim.fs.dirname(fname)
+          end
+
+          if not root_dir then
+            return
+          end
+
+          -- Prevent starting if already attached
+          for _, client in ipairs(vim.lsp.get_clients({ bufnr = bufnr })) do
+            if client.name == "basedpyright" then
+              return
+            end
+          end
+
+          pcall(vim.lsp.start, {
+            name = "basedpyright",
+            cmd = config.cmd,
+            root_dir = root_dir,
+            capabilities = config.capabilities,
+            settings = config.settings,
+          }, { bufnr = bufnr })
         end,
       })
     end,
