@@ -116,7 +116,14 @@ return {
           source = "if_many",
           prefix = "●",
         },
-        signs = true,
+        signs = {
+          text = {
+            [vim.diagnostic.severity.ERROR] = "",
+            [vim.diagnostic.severity.WARN] = "",
+            [vim.diagnostic.severity.HINT] = "",
+            [vim.diagnostic.severity.INFO] = "",
+          },
+        },
         underline = true,
         update_in_insert = false,
         severity_sort = true,
@@ -362,10 +369,8 @@ return {
         callback = function(args)
           local client = vim.lsp.get_client_by_id(args.data.client_id)
           if client and client:supports_method("textDocument/foldingRange") then
-            local bufnr = args.buf
-            local winid = vim.api.nvim_get_current_win()
-            -- Prefer LSP folding over treesitter when available
-            vim.wo[winid][bufnr].foldexpr = "v:lua.vim.lsp.foldexpr()"
+            -- Set foldexpr for the current window (window-local option)
+            vim.wo.foldexpr = "v:lua.vim.lsp.foldexpr()"
           end
         end,
       })

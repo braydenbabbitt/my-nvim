@@ -7,6 +7,9 @@ vim.g.snacks_animate = false
 -- Disable bracketed paste
 vim.cmd("set t_BE=")
 
+-- Terminal settings
+vim.opt.termguicolors = true -- Enable 24-bit RGB colors
+
 -- Basic editor settings
 vim.opt.number = true -- Show line numbers
 vim.opt.relativenumber = true -- Show relative line numbers
