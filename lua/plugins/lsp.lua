@@ -1,6 +1,25 @@
 -- LSP Configuration
 -- Language Server Protocol setup with multiple language servers
 
+-- ===================================================================
+-- CENTRALIZED SERVER LIST
+-- ===================================================================
+-- Add or remove servers here to enable/disable them globally
+local servers = {
+  "lua_ls",
+  "vtsls",
+  "eslint",
+  "denols",
+  "tailwindcss",
+  "basedpyright",
+  "postgres_lsp", -- Note: not available via mason, install manually
+}
+
+-- Servers available via Mason (excludes postgres_lsp)
+local mason_servers = vim.tbl_filter(function(server)
+  return server ~= "postgres_lsp"
+end, servers)
+
 return {
   -- Mason - LSP/DAP/Linter installer
   {
@@ -25,18 +44,12 @@ return {
     "williamboman/mason-lspconfig.nvim",
     commit = "1a31f82",
     dependencies = { "mason.nvim" },
-    opts = {
-      ensure_installed = {
-        "lua_ls",
-        "vtsls",
-        "eslint",
-        "denols",
-        "tailwindcss",
-        "basedpyright",
-        -- Note: postgres_lsp is not available via mason, install manually if needed
-      },
-      automatic_installation = true,
-    },
+    opts = function()
+      return {
+        ensure_installed = mason_servers,
+        automatic_installation = true,
+      }
+    end,
   },
 
   -- LSP Configuration
@@ -119,32 +132,6 @@ return {
       local capabilities = vim.lsp.protocol.make_client_capabilities()
       capabilities = vim.tbl_deep_extend("force", capabilities, require("blink.cmp").get_lsp_capabilities())
 
-      -- Helper function to find project root
-      local function root_pattern(...)
-        local patterns = { ... }
-        return function(fname)
-          -- fname might be a buffer number, convert it to a file path
-          local path = fname
-          if type(fname) == "number" then
-            path = vim.api.nvim_buf_get_name(fname)
-          end
-
-          -- Return nil if path is empty
-          if not path or path == "" then
-            return nil
-          end
-
-          local util = vim.fs
-          for _, pattern in ipairs(patterns) do
-            local found = util.find(pattern, { path = path, upward = true })
-            if found and #found > 0 then
-              return vim.fs.dirname(found[1])
-            end
-          end
-          return nil
-        end
-      end
-
       -- ===================================================================
       -- SERVER DEFINITIONS
       -- ===================================================================
@@ -153,16 +140,13 @@ return {
       vim.lsp.config.lua_ls = {
         cmd = { "lua-language-server" },
         filetypes = { "lua" },
-        root_dir = root_pattern(
-          ".luarc.json",
-          ".luarc.jsonc",
+        root_markers = {
+          { ".luarc.json", ".luarc.jsonc" }, -- Equal priority
           ".luacheckrc",
-          ".stylua.toml",
-          "stylua.toml",
-          "selene.toml",
-          "selene.yml",
-          ".git"
-        ),
+          { ".stylua.toml", "stylua.toml" }, -- Equal priority
+          { "selene.toml", "selene.yml" }, -- Equal priority
+          ".git",
+        },
         capabilities = capabilities,
         settings = {
           Lua = {
@@ -183,19 +167,45 @@ return {
       }
 
       -- TypeScript/JavaScript (vtsls)
+      -- Uses root_dir function to exclude Deno projects
       vim.lsp.config.vtsls = {
         cmd = { "vtsls", "--stdio" },
         filetypes = { "typescript", "javascript", "typescriptreact", "javascriptreact" },
-        root_dir = root_pattern("package.json"),
+        root_markers = { "package.json" },
         single_file_support = false,
         capabilities = capabilities,
+        -- Custom root_dir to skip Deno projects
+        root_dir = function(bufnr, on_dir)
+          local fname = vim.api.nvim_buf_get_name(bufnr)
+          if fname == "" then
+            on_dir(nil)
+            return
+          end
+
+          -- Skip if this is a Deno project
+          local deno_markers = vim.fs.find({ "deno.json", "deno.jsonc", "deno.lock" }, {
+            path = fname,
+            upward = true,
+          })
+          if #deno_markers > 0 then
+            on_dir(nil)
+            return
+          end
+
+          -- Find package.json
+          local markers = vim.fs.find({ "package.json" }, {
+            path = fname,
+            upward = true,
+          })
+          on_dir(markers[1] and vim.fs.dirname(markers[1]) or nil)
+        end,
       }
 
       -- Deno
       vim.lsp.config.denols = {
         cmd = { "deno", "lsp" },
         filetypes = { "typescript", "javascript", "typescriptreact", "javascriptreact" },
-        root_dir = root_pattern("deno.json", "deno.jsonc", "deno.lock"),
+        root_markers = { "deno.json", "deno.jsonc", "deno.lock" },
         single_file_support = false,
         capabilities = capabilities,
         init_options = {
@@ -204,28 +214,37 @@ return {
         },
       }
 
-      -- ESLint configuration
-      -- Suppress deprecation warning temporarily while lspconfig transitions to vim.lsp.config
-      local original_notify = vim.notify
-      vim.notify = function(msg, level, opts)
-        if not string.match(msg or "", "lspconfig.*deprecated") then
-          original_notify(msg, level, opts)
-        end
-      end
-
-      local lspconfig = require("lspconfig")
-      lspconfig.eslint.setup({
+      -- ESLint
+      vim.lsp.config.eslint = {
+        cmd = { "vscode-eslint-language-server", "--stdio" },
+        filetypes = {
+          "javascript",
+          "javascriptreact",
+          "typescript",
+          "typescriptreact",
+          "vue",
+          "svelte",
+          "astro",
+        },
+        root_markers = {
+          ".eslintrc.js",
+          ".eslintrc.cjs",
+          ".eslintrc.yaml",
+          ".eslintrc.yml",
+          ".eslintrc.json",
+          "eslint.config.js",
+          "eslint.config.mjs",
+          "eslint.config.cjs",
+          "package.json",
+        },
         capabilities = capabilities,
         settings = {
           workingDirectories = { mode = "auto" },
           packageManager = "pnpm",
         },
-      })
+      }
 
-      -- Restore original notify
-      vim.notify = original_notify
-
-      -- NEW: Tailwind CSS Configuration
+      -- Tailwind CSS
       vim.lsp.config.tailwindcss = {
         cmd = { "tailwindcss-language-server", "--stdio" },
         filetypes = {
@@ -240,7 +259,10 @@ return {
           "svelte",
           "html",
         },
-        root_dir = root_pattern("tailwind.config.js", "tailwind.config.ts", "package.json"),
+        root_markers = {
+          { "tailwind.config.js", "tailwind.config.ts" }, -- Equal priority
+          "package.json",
+        },
         capabilities = capabilities,
         settings = {
           tailwindCSS = {
@@ -267,15 +289,15 @@ return {
       vim.lsp.config.basedpyright = {
         cmd = { "basedpyright-langserver", "--stdio" },
         filetypes = { "python" },
-        root_dir = root_pattern(
+        root_markers = {
           "pyproject.toml",
           "setup.py",
           "setup.cfg",
           "requirements.txt",
           "Pipfile",
           "pyrightconfig.json",
-          ".git"
-        ),
+          ".git",
+        },
         single_file_support = true,
         capabilities = capabilities,
         settings = {
@@ -290,124 +312,61 @@ return {
       }
 
       -- ===================================================================
-      -- SERVER STARTUP LOGIC
+      -- SERVER ACTIVATION
       -- ===================================================================
 
-      -- Enable LSP servers
-      vim.lsp.enable("lua_ls")
-      vim.lsp.enable("postgres_lsp")
-      vim.lsp.enable("basedpyright")
+      -- Enable all LSP servers from the centralized list
+      -- They will auto-attach based on filetypes and root_markers
+      vim.lsp.enable(servers)
 
-      -- Only enable one of vtsls or denols based on project type
-      -- Check if current buffer's directory has deno markers
-      local function is_deno_project(bufnr)
-        local fname = vim.api.nvim_buf_get_name(bufnr or 0)
-        if fname == "" then
-          return false
-        end
-        local deno_markers = { "deno.json", "deno.jsonc", "deno.lock" }
-        for _, marker in ipairs(deno_markers) do
-          local found = vim.fs.find(marker, { path = fname, upward = true })
-          if found and #found > 0 then
-            return true
-          end
-        end
-        return false
-      end
+      -- ===================================================================
+      -- MODERN 0.11 FEATURES
+      -- ===================================================================
 
-      -- REFACTORED: Centralized autocommand for JS/TS projects
-      vim.api.nvim_create_autocmd("FileType", {
-        pattern = {
-          "javascript",
-          "javascriptreact",
-          "typescript",
-          "typescriptreact",
-          "vue",
-          "svelte",
-          "astro",
-        },
-        group = vim.api.nvim_create_augroup("lsp-attach-js-ts", { clear = true }),
+      -- Auto-fold imports on file open
+      -- Configure which filetypes to exclude from auto-folding
+      local auto_fold_exclude_filetypes = {
+        -- Uncomment to exclude specific filetypes:
+        -- 'python',
+        -- 'lua',
+        -- 'javascript',
+        -- 'typescript',
+      }
+
+      vim.api.nvim_create_autocmd("LspNotify", {
+        group = vim.api.nvim_create_augroup("lsp-auto-fold-imports", { clear = true }),
         callback = function(args)
-          local bufnr = args.buf
+          if args.data.method == "textDocument/didOpen" then
+            local bufnr = args.buf
+            local ft = vim.bo[bufnr].filetype
 
-          -- Helper to start a server if its root is found
-          local function start_server(server)
-            local config = vim.lsp.config[server]
-            if not config then
+            -- Skip if filetype is in exclude list
+            if vim.tbl_contains(auto_fold_exclude_filetypes, ft) then
               return
             end
 
-            local root_dir = config.root_dir and config.root_dir(vim.api.nvim_buf_get_name(bufnr))
-            if not root_dir then
-              return
-            end -- Don't start if no project root is found
-
-            -- Prevent starting if already attached for this server name
-            for _, client in ipairs(vim.lsp.get_clients({ bufnr = bufnr })) do
-              if client.name == server then
-                return
-              end
+            local winid = vim.fn.bufwinid(bufnr)
+            if winid ~= -1 then
+              vim.lsp.foldclose("imports", winid)
             end
-
-            pcall(vim.lsp.start, {
-              name = server,
-              cmd = config.cmd,
-              root_dir = root_dir,
-              capabilities = config.capabilities,
-              settings = config.settings,
-              init_options = config.init_options,
-            }, { bufnr = bufnr })
           end
-
-          -- Conditionally start vtsls or denols
-          if is_deno_project(bufnr) then
-            start_server("denols")
-          else
-            start_server("vtsls")
-          end
-
-          -- Always try to start tailwindcss
-          start_server("tailwindcss")
         end,
       })
 
-      -- Python LSP autocommand
-      vim.api.nvim_create_autocmd("FileType", {
-        pattern = { "python" },
-        group = vim.api.nvim_create_augroup("lsp-attach-python", { clear = true }),
+      -- Set up LSP-based folding for supported servers
+      vim.o.foldmethod = "expr"
+      vim.o.foldexpr = "v:lua.vim.treesitter.foldexpr()" -- Default to treesitter
+
+      vim.api.nvim_create_autocmd("LspAttach", {
+        group = vim.api.nvim_create_augroup("lsp-folding", { clear = true }),
         callback = function(args)
-          local bufnr = args.buf
-          local config = vim.lsp.config.basedpyright
-          if not config then
-            return
+          local client = vim.lsp.get_client_by_id(args.data.client_id)
+          if client and client:supports_method("textDocument/foldingRange") then
+            local bufnr = args.buf
+            local winid = vim.api.nvim_get_current_win()
+            -- Prefer LSP folding over treesitter when available
+            vim.wo[winid][bufnr].foldexpr = "v:lua.vim.lsp.foldexpr()"
           end
-
-          local fname = vim.api.nvim_buf_get_name(bufnr)
-          local root_dir = config.root_dir and config.root_dir(fname)
-
-          -- For single file support, use file's directory if no root found
-          if not root_dir and config.single_file_support then
-            root_dir = vim.fs.dirname(fname)
-          end
-
-          if not root_dir then
-            return
-          end
-
-          -- Prevent starting if already attached
-          for _, client in ipairs(vim.lsp.get_clients({ bufnr = bufnr })) do
-            if client.name == "basedpyright" then
-              return
-            end
-          end
-
-          pcall(vim.lsp.start, {
-            name = "basedpyright",
-            cmd = config.cmd,
-            root_dir = root_dir,
-            capabilities = config.capabilities,
-            settings = config.settings,
-          }, { bufnr = bufnr })
         end,
       })
     end,
