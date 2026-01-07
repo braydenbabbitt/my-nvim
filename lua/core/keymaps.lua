@@ -58,32 +58,15 @@ vim.keymap.set("n", "<leader>lr", function()
     table.insert(client_names, client.name)
   end
 
-  vim.notify("Stopping LSP clients: " .. table.concat(client_names, ", "), vim.log.levels.INFO)
+  vim.notify("Restarting LSP clients for current buffer: " .. table.concat(client_names, ", "), vim.log.levels.INFO)
 
-  -- Stop all clients and collect their IDs
-  local client_ids = {}
+  -- Detach clients from current buffer only (doesn't stop the server)
   for _, client in ipairs(clients) do
-    table.insert(client_ids, client.id)
-    client:stop()
+    vim.lsp.buf_detach_client(buf, client.id)
   end
 
-  -- Poll until all clients are actually stopped
-  local function wait_for_stop()
-    for _, id in ipairs(client_ids) do
-      local client = vim.lsp.get_client_by_id(id)
-      if client then
-        -- Client still exists, keep waiting
-        vim.defer_fn(wait_for_stop, 100)
-        return
-      end
-    end
-    -- All clients stopped, now restart
-    vim.notify("Restarting LSP clients...", vim.log.levels.INFO)
-    vim.cmd("edit")
-  end
-
-  -- Start polling after a short delay
-  vim.defer_fn(wait_for_stop, 100)
+  -- Reload buffer to trigger LSP reattachment
+  vim.cmd("edit")
 end, { desc = "Restart LSPs for current buffer", remap = true })
 
 vim.keymap.set("n", "<leader>Li", "<cmd>LspInfo<CR>", { desc = "LSP Info", remap = true })
