@@ -2,6 +2,77 @@
 -- Language Server Protocol setup with multiple language servers
 
 -- ===================================================================
+-- TYPESCRIPT/DENO LSP TOGGLE
+-- ===================================================================
+-- Helper functions to manage TypeScript LSP preference (vtsls vs denols)
+local ts_lsp_state = {
+  current = "vtsls", -- default to vtsls
+  has_notified_no_git = false, -- track if we've already notified about missing git repo
+}
+
+-- Get the state file path for the current git repo
+local function get_state_file_path()
+  local git_dir = vim.fn.finddir(".git", ".;")
+  if git_dir == "" then
+    return nil
+  end
+  local state_dir = vim.fn.fnamemodify(git_dir, ":p:h") .. "/.git/x-lsp"
+  return state_dir .. "/ts-lsp.json"
+end
+
+-- Read the LSP preference from .git/x-lsp/ts-lsp.json
+local function read_ts_lsp_state()
+  local state_file = get_state_file_path()
+  if not state_file then
+    return "vtsls" -- default if not in a git repo
+  end
+
+  local file = io.open(state_file, "r")
+  if not file then
+    return "vtsls" -- default if file doesn't exist
+  end
+
+  local content = file:read("*a")
+  file:close()
+
+  local ok, decoded = pcall(vim.json.decode, content)
+  if ok and decoded and decoded.lsp then
+    return decoded.lsp
+  end
+
+  return "vtsls" -- default on parse error
+end
+
+-- Write the LSP preference to .git/x-lsp/ts-lsp.json
+local function write_ts_lsp_state(lsp)
+  local state_file = get_state_file_path()
+  if not state_file then
+    -- Only notify the first time per session
+    if not ts_lsp_state.has_notified_no_git then
+      vim.notify("Not in a git repository, cannot save LSP state", vim.log.levels.WARN)
+      ts_lsp_state.has_notified_no_git = true
+    end
+    return
+  end
+
+  -- Create directory if it doesn't exist
+  local state_dir = vim.fn.fnamemodify(state_file, ":h")
+  vim.fn.mkdir(state_dir, "p")
+
+  local file = io.open(state_file, "w")
+  if not file then
+    vim.notify("Failed to write LSP state file", vim.log.levels.ERROR)
+    return
+  end
+
+  file:write(vim.json.encode({ lsp = lsp }))
+  file:close()
+end
+
+-- Initialize state from file
+ts_lsp_state.current = read_ts_lsp_state()
+
+-- ===================================================================
 -- CENTRALIZED SERVER LIST
 -- ===================================================================
 -- Add or remove servers here to enable/disable them globally
@@ -9,7 +80,7 @@ local servers = {
   "lua_ls",
   "vtsls",
   "eslint",
-  "denols",
+  -- "denols", -- Disabled by default, use <leader>lt to toggle between vtsls and denols
   "tailwindcss",
   "basedpyright",
   "postgres_lsp", -- Note: not available via mason, install manually
@@ -109,6 +180,52 @@ return {
         end,
       })
 
+      -- Toggle between vtsls and denols
+      vim.keymap.set("n", "<leader>lt", function()
+        local new_lsp = ts_lsp_state.current == "vtsls" and "denols" or "vtsls"
+        local old_lsp = ts_lsp_state.current
+
+        -- Update state
+        ts_lsp_state.current = new_lsp
+        write_ts_lsp_state(new_lsp)
+
+        -- Get all TypeScript/JavaScript buffers
+        local ts_buffers = {}
+        for _, bufnr in ipairs(vim.api.nvim_list_bufs()) do
+          if vim.api.nvim_buf_is_loaded(bufnr) then
+            local ft = vim.bo[bufnr].filetype
+            if vim.tbl_contains({ "typescript", "javascript", "typescriptreact", "javascriptreact" }, ft) then
+              table.insert(ts_buffers, bufnr)
+            end
+          end
+        end
+
+        -- Stop the old LSP client for all TS/JS buffers
+        for _, bufnr in ipairs(ts_buffers) do
+          local clients = vim.lsp.get_clients({ bufnr = bufnr, name = old_lsp })
+          for _, client in ipairs(clients) do
+            vim.lsp.stop_client(client.id)
+          end
+        end
+
+        -- Enable the new LSP
+        if new_lsp == "denols" then
+          vim.lsp.enable("denols")
+        else
+          vim.lsp.enable("vtsls")
+        end
+
+        -- Restart LSP for all TS/JS buffers
+        vim.defer_fn(function()
+          for _, bufnr in ipairs(ts_buffers) do
+            -- Trigger LSP attach by setting filetype again
+            local ft = vim.bo[bufnr].filetype
+            vim.bo[bufnr].filetype = ft
+          end
+          vim.notify(string.format("Switched to %s", new_lsp), vim.log.levels.INFO)
+        end, 100)
+      end, { desc = "LSP: Toggle TypeScript LSP (vtsls/denols)", noremap = true, silent = true })
+
       -- Configure diagnostic display
       vim.diagnostic.config({
         virtual_text = {
@@ -174,27 +291,23 @@ return {
       }
 
       -- TypeScript/JavaScript (vtsls)
-      -- Uses root_dir function to exclude Deno projects
+      -- Only activates when vtsls is the selected TypeScript LSP
       vim.lsp.config.vtsls = {
         cmd = { "vtsls", "--stdio" },
         filetypes = { "typescript", "javascript", "typescriptreact", "javascriptreact" },
         root_markers = { "package.json" },
         single_file_support = false,
         capabilities = capabilities,
-        -- Custom root_dir to skip Deno projects
+        -- Custom root_dir to respect toggle state
         root_dir = function(bufnr, on_dir)
-          local fname = vim.api.nvim_buf_get_name(bufnr)
-          if fname == "" then
+          -- Only activate if vtsls is selected
+          if ts_lsp_state.current ~= "vtsls" then
             on_dir(nil)
             return
           end
 
-          -- Skip if this is a Deno project
-          local deno_markers = vim.fs.find({ "deno.json", "deno.jsonc", "deno.lock" }, {
-            path = fname,
-            upward = true,
-          })
-          if #deno_markers > 0 then
+          local fname = vim.api.nvim_buf_get_name(bufnr)
+          if fname == "" then
             on_dir(nil)
             return
           end
@@ -209,6 +322,7 @@ return {
       }
 
       -- Deno
+      -- Only activates when denols is the selected TypeScript LSP
       vim.lsp.config.denols = {
         cmd = { "deno", "lsp" },
         filetypes = { "typescript", "javascript", "typescriptreact", "javascriptreact" },
@@ -219,6 +333,27 @@ return {
           enable = true,
           lint = true,
         },
+        -- Custom root_dir to respect toggle state
+        root_dir = function(bufnr, on_dir)
+          -- Only activate if denols is selected
+          if ts_lsp_state.current ~= "denols" then
+            on_dir(nil)
+            return
+          end
+
+          local fname = vim.api.nvim_buf_get_name(bufnr)
+          if fname == "" then
+            on_dir(nil)
+            return
+          end
+
+          -- Find deno config files
+          local markers = vim.fs.find({ "deno.json", "deno.jsonc", "deno.lock" }, {
+            path = fname,
+            upward = true,
+          })
+          on_dir(markers[1] and vim.fs.dirname(markers[1]) or nil)
+        end,
       }
 
       -- ESLint
