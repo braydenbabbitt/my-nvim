@@ -69,8 +69,37 @@ local function write_ts_lsp_state(lsp)
   file:close()
 end
 
--- Initialize state from file
-ts_lsp_state.current = read_ts_lsp_state()
+-- Initialize state from file or detect Deno project
+local function initialize_ts_lsp_state()
+  -- First check if we have a saved state
+  local saved_state = read_ts_lsp_state()
+  
+  -- If state file exists, use it
+  local state_file = get_state_file_path()
+  if state_file then
+    local file = io.open(state_file, "r")
+    if file then
+      file:close()
+      return saved_state
+    end
+  end
+  
+  -- No saved state, check if this is a Deno project
+  -- Look for Deno-specific config files in the current directory and upward
+  local cwd = vim.fn.getcwd()
+  local deno_markers = vim.fs.find({ "deno.json", "deno.jsonc" }, {
+    path = cwd,
+    upward = true,
+  })
+  
+  if #deno_markers > 0 then
+    return "denols"
+  end
+  
+  return "vtsls" -- default to vtsls
+end
+
+ts_lsp_state.current = initialize_ts_lsp_state()
 
 -- ===================================================================
 -- CENTRALIZED SERVER LIST
