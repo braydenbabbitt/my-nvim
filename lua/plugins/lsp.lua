@@ -73,7 +73,7 @@ end
 local function initialize_ts_lsp_state()
   -- First check if we have a saved state
   local saved_state = read_ts_lsp_state()
-  
+
   -- If state file exists, use it
   local state_file = get_state_file_path()
   if state_file then
@@ -83,7 +83,7 @@ local function initialize_ts_lsp_state()
       return saved_state
     end
   end
-  
+
   -- No saved state, check if this is a Deno project
   -- Look for Deno-specific config files in the current directory and upward
   local cwd = vim.fn.getcwd()
@@ -91,11 +91,11 @@ local function initialize_ts_lsp_state()
     path = cwd,
     upward = true,
   })
-  
+
   if #deno_markers > 0 then
     return "denols"
   end
-  
+
   return "vtsls" -- default to vtsls
 end
 
@@ -331,11 +331,16 @@ return {
           typescript = {
             preferences = {
               importModuleSpecifier = "relative",
+              importModuleSpecifierEnding = "auto",
+              -- Prevents deep imports from package.json exports (e.g., @example/app/deep/import)
+              includePackageJsonAutoImports = "off",
             },
           },
           javascript = {
             preferences = {
               importModuleSpecifier = "relative",
+              importModuleSpecifierEnding = "auto",
+              includePackageJsonAutoImports = "off",
             },
           },
         },
