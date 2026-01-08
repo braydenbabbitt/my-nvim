@@ -5,7 +5,7 @@ return {
   -- VSCode theme (default)
   {
     "Mofiqul/vscode.nvim",
-    commit = "cb9df08",
+    commit = "aa1102a",
     lazy = false,
     priority = 1000,
     config = function()

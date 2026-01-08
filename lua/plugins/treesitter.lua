@@ -14,6 +14,12 @@ return {
     -- Note: install_dir is handled by the plugin itself in lazy.nvim setup
     -- Parsers are installed in the plugin's parser directory
     
+    -- Enable treesitter-based syntax highlighting
+    highlight = {
+      enable = true,
+      additional_vim_regex_highlighting = false,
+    },
+    
     ensure_installed = {
       "bash",
       "c",
@@ -61,7 +67,7 @@ return {
     local parser_install_dir = vim.fn.stdpath("data") .. "/lazy/nvim-treesitter"
     vim.opt.runtimepath:append(parser_install_dir)
     
-    -- New API: require('nvim-treesitter').setup() instead of .configs
-    require("nvim-treesitter").setup(opts)
+    -- Correct API: require('nvim-treesitter.configs').setup() to configure modules
+    require("nvim-treesitter.configs").setup(opts)
   end,
 }

@@ -327,6 +327,18 @@ return {
         root_markers = { "package.json" },
         single_file_support = false,
         capabilities = capabilities,
+        settings = {
+          typescript = {
+            preferences = {
+              importModuleSpecifier = "relative",
+            },
+          },
+          javascript = {
+            preferences = {
+              importModuleSpecifier = "relative",
+            },
+          },
+        },
         -- Custom root_dir to respect toggle state
         root_dir = function(bufnr, on_dir)
           -- Only activate if vtsls is selected

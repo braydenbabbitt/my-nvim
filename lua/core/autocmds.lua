@@ -120,21 +120,5 @@ vim.api.nvim_create_autocmd("FileType", {
   end,
 })
 
--- Enable treesitter-based features for all supported filetypes
-vim.api.nvim_create_autocmd("FileType", {
-  pattern = {
-    "bash", "c", "cpp", "css", "diff", "go", "html", "java",
-    "javascript", "json", "jsonc", "lua", "markdown", "python",
-    "query", "regex", "rust", "toml", "tsx", "typescript", "vim",
-    "vimdoc", "xml", "yaml",
-  },
-  callback = function()
-    -- Enable treesitter highlighting
-    vim.treesitter.start()
-    
-    -- Enable treesitter-based folding
-    vim.wo[0][0].foldmethod = "expr"
-    vim.wo[0][0].foldexpr = "v:lua.vim.treesitter.foldexpr()"
-  end,
-  desc = "Enable treesitter features for supported languages",
-})
+-- Treesitter highlighting is now configured in lua/plugins/treesitter.lua
+-- No manual FileType autocmd needed
