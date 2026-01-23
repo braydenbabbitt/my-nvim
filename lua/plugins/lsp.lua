@@ -330,7 +330,7 @@ return {
         settings = {
           typescript = {
             preferences = {
-              importModuleSpecifier = "relative",
+              importModuleSpecifier = "project-relative",
               importModuleSpecifierEnding = "auto",
               -- Prevents deep imports from package.json exports (e.g., @example/app/deep/import)
               includePackageJsonAutoImports = "off",
@@ -338,7 +338,7 @@ return {
           },
           javascript = {
             preferences = {
-              importModuleSpecifier = "relative",
+              importModuleSpecifier = "project-relative",
               importModuleSpecifierEnding = "auto",
               includePackageJsonAutoImports = "off",
             },
