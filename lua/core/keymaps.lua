@@ -308,3 +308,47 @@ vim.api.nvim_create_user_command("TerminalDebug", function()
     end
   end
 end, {})
+
+-- Quickfix list item removal
+vim.api.nvim_create_autocmd("FileType", {
+  pattern = "qf",
+  callback = function(ev)
+    local function delete_qf_items(is_visual)
+      local qflist = vim.fn.getqflist()
+      local start_idx, end_idx
+
+      if is_visual then
+        -- Get range for visual selection
+        start_idx = vim.fn.line("v")
+        end_idx = vim.fn.line(".")
+        if start_idx > end_idx then
+          start_idx, end_idx = end_idx, start_idx
+        end
+      else
+        -- Single line
+        start_idx = vim.fn.line(".")
+        end_idx = start_idx
+      end
+
+      -- Remove items in reverse to maintain correct indices
+      for i = end_idx, start_idx, -1 do
+        table.remove(qflist, i)
+      end
+
+      -- Update the list and keep the cursor position
+      vim.fn.setqflist(qflist, "r")
+      vim.fn.cursor(start_idx, 1)
+    end
+
+    -- Buffer-local mappings
+    vim.keymap.set("n", "dd", function()
+      delete_qf_items(false)
+    end, { buffer = ev.buf, desc = "Remove item from quickfix" })
+    vim.keymap.set("v", "d", function()
+      delete_qf_items(true)
+    end, { buffer = ev.buf, desc = "Remove selection from quickfix" })
+    vim.keymap.set("v", "x", function()
+      delete_qf_items(true)
+    end, { buffer = ev.buf, desc = "Remove selection from quickfix" })
+  end,
+})
