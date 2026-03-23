@@ -168,8 +168,7 @@ return {
             end,
             -- Enable watch mode for continuous testing
             is_test_file = function(file_path)
-              return string.match(file_path, "%.test%.") ~= nil
-                or string.match(file_path, "%.spec%.") ~= nil
+              return string.match(file_path, "%.test%.") ~= nil or string.match(file_path, "%.spec%.") ~= nil
             end,
           }),
 
@@ -180,8 +179,7 @@ return {
               enable_dynamic_test_discovery = true,
               -- Filter to only run playwright tests
               is_test_file = function(file_path)
-                return string.match(file_path, "%.e2e%.") ~= nil
-                  or string.match(file_path, "%.playwright%.") ~= nil
+                return string.match(file_path, "%.e2e%.") ~= nil or string.match(file_path, "%.playwright%.") ~= nil
               end,
             },
           }),

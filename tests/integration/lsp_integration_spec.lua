@@ -1,5 +1,5 @@
 local helpers = require("tests.helpers")
-local mock = helpers.mock
+local _mock = helpers.mock
 
 describe("LSP integration", function()
   before_each(function()

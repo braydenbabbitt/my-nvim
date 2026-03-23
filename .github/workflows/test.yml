@@ -27,13 +27,13 @@ jobs:
         if: runner.os == 'Linux'
         run: |
           if [ "${{ matrix.nvim-version }}" == "stable" ]; then
-            wget https://github.com/neovim/neovim/releases/download/stable/nvim-linux64.tar.gz
-            tar xzf nvim-linux64.tar.gz
-            echo "$PWD/nvim-linux64/bin" >> $GITHUB_PATH
+            wget https://github.com/neovim/neovim/releases/download/stable/nvim-linux-x86_64.tar.gz
+            tar xzf nvim-linux-x86_64.tar.gz
+            echo "$PWD/nvim-linux-x86_64/bin" >> $GITHUB_PATH
           else
-            wget https://github.com/neovim/neovim/releases/download/nightly/nvim-linux64.tar.gz
-            tar xzf nvim-linux64.tar.gz
-            echo "$PWD/nvim-linux64/bin" >> $GITHUB_PATH
+            wget https://github.com/neovim/neovim/releases/download/nightly/nvim-linux-x86_64.tar.gz
+            tar xzf nvim-linux-x86_64.tar.gz
+            echo "$PWD/nvim-linux-x86_64/bin" >> $GITHUB_PATH
           fi
 
       - name: Install Neovim (macOS)

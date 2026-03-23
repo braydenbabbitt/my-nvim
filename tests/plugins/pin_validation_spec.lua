@@ -41,7 +41,10 @@ describe("plugin commit pinning", function()
         -- - Some files have multiple plugins
         if file == "lsp.lua" then
           -- mason.nvim, mason-lspconfig.nvim, nvim-lspconfig = 3 commits
-          assert.is_true(commit_count >= 3, string.format("Expected at least 3 commits in lsp.lua, found %d", commit_count))
+          assert.is_true(
+            commit_count >= 3,
+            string.format("Expected at least 3 commits in lsp.lua, found %d", commit_count)
+          )
         elseif file == "editor.lua" then
           -- mini.pairs, mini.surround, mini.comment, mini.ai, better-escape, indent-blankline, nvim-ts-context-commentstring = 7 commits
           assert.is_true(
@@ -62,10 +65,16 @@ describe("plugin commit pinning", function()
           )
         elseif file == "git.lua" then
           -- gitsigns = 1 commit
-          assert.is_true(commit_count >= 1, string.format("Expected at least 1 commit in git.lua, found %d", commit_count))
+          assert.is_true(
+            commit_count >= 1,
+            string.format("Expected at least 1 commit in git.lua, found %d", commit_count)
+          )
         else
           -- Most files have 1 main plugin
-          assert.is_true(commit_count >= 1, string.format("Expected at least 1 commit in %s, found %d", file, commit_count))
+          assert.is_true(
+            commit_count >= 1,
+            string.format("Expected at least 1 commit in %s, found %d", file, commit_count)
+          )
         end
       end)
 

@@ -22,6 +22,7 @@ read_globals = {
 ignore = {
   "212", -- Unused argument
   "631", -- Line is too long
+  "614", -- Setting read-only field of global (needed for mocking io.open in tests)
 }
 
 -- Exclude certain files/directories
