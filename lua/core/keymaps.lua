@@ -153,6 +153,10 @@ vim.keymap.set("n", "<leader>alo", function()
   aicli.set_current_tool("opencode")
 end, { desc = "Switch to opencode" })
 
+vim.keymap.set("n", "<leader>alp", function()
+  aicli.set_current_tool("opencode-proxy")
+end, { desc = "Switch to opencode proxy" })
+
 -- Terminal keymaps (use current selected tool)
 local function get_ai_terminal_name()
   return aicli.get_terminal_command()

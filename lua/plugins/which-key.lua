@@ -99,6 +99,7 @@ return {
       { "<leader>n", group = "Notifications", icon = "" },
       { "<leader>q", group = "Quit/Session", icon = "" },
       { "<leader>s", group = "Search", icon = "" },
+      { "<leader>t", group = "Test", icon = "󰙨" },
       { "<leader>u", group = "UI/Toggle", icon = "" },
       { "<leader>w", group = "Windows", icon = "" },
       { "<leader>x", desc = "Blackhole Register Delete" },

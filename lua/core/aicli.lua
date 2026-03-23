@@ -13,6 +13,26 @@ local CLI_TOOLS = {
     install_cmd = "npm install -g opencode-ai",
     description = "OpenCode AI assistant",
   },
+  ["opencode-proxy"] = {
+    name = "OpenCode Proxy",
+    display_name = "OpenCode Proxy",
+    executable = "opencode",
+    install_check = function()
+      if vim.fn.executable("opencode") ~= 1 then
+        return false, "opencode CLI is not installed. Install with: npm install -g opencode-ai"
+      end
+      local result = vim.fn.system("curl -s -o /dev/null -w '%{http_code}' http://localhost:3456 2>/dev/null")
+      result = vim.trim(result)
+      if vim.v.shell_error ~= 0 or result == "000" then
+        return false,
+          "OpenCode proxy server is not running on port 3456.\nSee: https://github.com/rynfar/opencode-claude-max-proxy"
+      end
+      return true
+    end,
+    install_cmd = "npm install -g opencode-ai",
+    description = "OpenCode AI assistant via proxy",
+    terminal_cmd = "ANTHROPIC_API_KEY=dummy ANTHROPIC_BASE_URL=http://127.0.0.1:3456 opencode",
+  },
   claude = {
     name = "Claude Code",
     display_name = "Claude Code",
@@ -152,9 +172,10 @@ function M.set_current_tool(tool_id)
   end
 
   -- Check if tool is installed
-  if not is_tool_installed(tool_id) then
+  local installed, err_msg = is_tool_installed(tool_id)
+  if not installed then
     vim.notify(
-      string.format("%s is not installed. Use <leader>als to install it.", tool.display_name),
+      err_msg or string.format("%s is not installed. Use <leader>als to install it.", tool.display_name),
       vim.log.levels.WARN
     )
     return false
@@ -233,13 +254,18 @@ local function handle_tool_selection(tool_id)
   end
 
   -- Check if installed
-  if not is_tool_installed(tool_id) then
-    -- Prompt for installation
-    local confirm =
-      vim.fn.confirm(string.format("%s is not installed. Install now?", tool.display_name), "&Yes\n&No", 2)
+  local installed, err_msg = is_tool_installed(tool_id)
+  if not installed then
+    if err_msg then
+      vim.notify(err_msg, vim.log.levels.WARN)
+    else
+      -- Prompt for installation
+      local confirm =
+        vim.fn.confirm(string.format("%s is not installed. Install now?", tool.display_name), "&Yes\n&No", 2)
 
-    if confirm == 1 then
-      install_tool(tool_id)
+      if confirm == 1 then
+        install_tool(tool_id)
+      end
     end
   else
     -- Tool is installed, switch to it
@@ -251,7 +277,7 @@ end
 -- Displays all tools with installation status (✓/✗)
 function M.show_selection_menu()
   -- Define a consistent order for tools
-  local tool_order = { "opencode", "claude", "gemini", "copilot" }
+  local tool_order = { "opencode", "opencode-proxy", "claude", "gemini", "copilot" }
 
   local items = {}
   local tool_ids = {}
