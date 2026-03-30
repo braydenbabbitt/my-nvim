@@ -276,6 +276,19 @@ vim.keymap.set("n", "<C-Right>", "<cmd>vertical resize +2<cr>", { desc = "Increa
 -- Quit/Save shortcuts
 vim.keymap.set("n", "<leader>qq", "<cmd>qa<cr>", { desc = "Quit all" })
 
+-- Copy file path to clipboard
+vim.keymap.set("n", "<leader>fpr", function()
+  local path = vim.fn.expand("%:.")
+  vim.fn.setreg("+", path)
+  vim.notify("Copied relative path: " .. path)
+end, { desc = "Copy relative path to clipboard" })
+
+vim.keymap.set("n", "<leader>fpa", function()
+  local path = vim.fn.expand("%:p")
+  vim.fn.setreg("+", path)
+  vim.notify("Copied absolute path: " .. path)
+end, { desc = "Copy absolute path to clipboard" })
+
 -- Folding keymaps
 vim.keymap.set("n", "<leader>za", "za", { desc = "Toggle fold" })
 vim.keymap.set("n", "<leader>zc", "zc", { desc = "Close fold" })

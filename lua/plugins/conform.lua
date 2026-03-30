@@ -31,12 +31,12 @@ return {
       scss = { "prettier" },
       astro = { "prettier" },
     },
-    format_on_save = {
-      -- Disable format on save by default (ESLint handles JS/TS via autocmd)
-      -- Enable manually with <leader>cf or set this to true
-      timeout_ms = 500,
-      lsp_fallback = true,
-    },
+    format_on_save = function()
+      if vim.g.autoformat == false then
+        return nil
+      end
+      return { timeout_ms = 500, lsp_fallback = true }
+    end,
     -- Set up formatters
     formatters = {
       prettier = {

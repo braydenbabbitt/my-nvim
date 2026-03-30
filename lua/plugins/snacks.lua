@@ -252,6 +252,15 @@ return {
         Snacks.toggle.treesitter():map("<leader>uT")
         Snacks.toggle.option("background", { off = "light", on = "dark", name = "Dark Background" }):map("<leader>ub")
         Snacks.toggle.inlay_hints():map("<leader>uh")
+        Snacks.toggle.new({
+          name = "Autoformat on Save",
+          get = function()
+            return vim.g.autoformat ~= false
+          end,
+          set = function(state)
+            vim.g.autoformat = state
+          end,
+        }):map("<leader>uf")
       end,
     })
   end,
