@@ -113,11 +113,14 @@ local servers = {
   "tailwindcss",
   "basedpyright",
   "postgres_lsp", -- Note: not available via mason, install manually
+  "gdscript", -- Godot 4.x built-in LSP (connects to running editor on port 6005)
+  "omnisharp", -- C# for Godot
+  "clangd", -- C++ for Godot GDExtension
 }
 
--- Servers available via Mason (excludes postgres_lsp)
+-- Servers available via Mason (excludes manually installed servers)
 local mason_servers = vim.tbl_filter(function(server)
-  return server ~= "postgres_lsp"
+  return not vim.tbl_contains({ "postgres_lsp", "gdscript" }, server)
 end, servers)
 
 return {
@@ -497,6 +500,58 @@ return {
             },
           },
         },
+      }
+
+      -- GDScript (Godot 4.x built-in LSP)
+      -- Requires Godot editor to be running with LSP enabled (Editor > Editor Settings > Network > Language Server)
+      vim.lsp.config.gdscript = {
+        cmd = vim.lsp.rpc.connect("127.0.0.1", 6005),
+        filetypes = { "gdscript" },
+        root_markers = { "project.godot" },
+        capabilities = capabilities,
+      }
+
+      -- C# (OmniSharp) for Godot C# projects
+      vim.lsp.config.omnisharp = {
+        cmd = { "omnisharp", "--languageserver" },
+        filetypes = { "cs" },
+        root_markers = { "*.sln", "*.csproj", "project.godot" },
+        capabilities = capabilities,
+        settings = {
+          FormattingOptions = {
+            EnableEditorConfigSupport = true,
+          },
+          RoslynExtensionsOptions = {
+            EnableAnalyzersSupport = true,
+            EnableImportCompletion = true,
+          },
+        },
+      }
+
+      -- Clangd for C++ (GDExtension development)
+      vim.lsp.config.clangd = {
+        cmd = {
+          "clangd",
+          "--background-index",
+          "--clang-tidy",
+          "--header-insertion=iwyu",
+          "--completion-style=detailed",
+          "--function-arg-placeholders",
+        },
+        filetypes = { "c", "cpp", "objc", "objcpp" },
+        root_markers = {
+          ".clangd",
+          ".clang-tidy",
+          ".clang-format",
+          "compile_commands.json",
+          "compile_flags.txt",
+          "SConstruct", -- Godot/GDExtension build file
+          ".git",
+        },
+        single_file_support = true,
+        capabilities = vim.tbl_deep_extend("force", capabilities, {
+          offsetEncoding = { "utf-16" },
+        }),
       }
 
       -- ===================================================================

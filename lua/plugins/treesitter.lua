@@ -23,7 +23,11 @@ return {
     ensure_installed = {
       "bash",
       "c",
+      "cpp",
+      "c_sharp",
       "diff",
+      "gdscript",
+      "godot_resource",
       "html",
       "javascript",
       "jsdoc",

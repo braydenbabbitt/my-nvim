@@ -48,6 +48,8 @@ return {
             "js-debug-adapter", -- JavaScript/TypeScript
             "debugpy", -- Python
             "delve", -- Go
+            "codelldb", -- C/C++
+            "netcoredbg", -- C#/.NET
           },
           automatic_installation = true,
           handlers = {}, -- Use default handlers
@@ -536,6 +538,102 @@ return {
             command = "nvim",
           },
           args = { "-l", "${file}" },
+        },
+      }
+
+      -- ===================================================================
+      -- Godot (GDScript) - connects to Godot's built-in DAP server
+      -- ===================================================================
+      dap.adapters.godot = {
+        type = "server",
+        host = "127.0.0.1",
+        port = 6006, -- Godot 4.x DAP port
+      }
+
+      dap.configurations.gdscript = {
+        {
+          type = "godot",
+          request = "launch",
+          name = "Launch Godot Scene",
+          project = "${workspaceFolder}",
+        },
+      }
+
+      -- ===================================================================
+      -- C/C++ (codelldb) - for GDExtension development
+      -- ===================================================================
+      dap.adapters.codelldb = {
+        type = "server",
+        port = "${port}",
+        executable = {
+          command = "codelldb",
+          args = { "--port", "${port}" },
+        },
+      }
+
+      dap.configurations.cpp = {
+        {
+          type = "codelldb",
+          request = "launch",
+          name = "Launch executable",
+          program = function()
+            return vim.fn.input("Path to executable: ", vim.fn.getcwd() .. "/", "file")
+          end,
+          cwd = "${workspaceFolder}",
+          stopOnEntry = false,
+        },
+        {
+          type = "codelldb",
+          request = "launch",
+          name = "Attach to Godot (GDExtension)",
+          program = function()
+            return vim.fn.input("Path to Godot executable: ", "/Applications/Godot.app/Contents/MacOS/Godot", "file")
+          end,
+          cwd = "${workspaceFolder}",
+          stopOnEntry = false,
+          args = function()
+            local project = vim.fn.findfile("project.godot", ".;")
+            if project ~= "" then
+              return { "--path", vim.fn.fnamemodify(project, ":h") }
+            end
+            return {}
+          end,
+        },
+      }
+
+      dap.configurations.c = dap.configurations.cpp
+
+      -- ===================================================================
+      -- C# (netcoredbg) - for Godot C# projects
+      -- ===================================================================
+      dap.adapters.coreclr = {
+        type = "executable",
+        command = "netcoredbg",
+        args = { "--interpreter=vscode" },
+      }
+
+      dap.configurations.cs = {
+        {
+          type = "coreclr",
+          request = "launch",
+          name = "Launch .NET project",
+          program = function()
+            -- Try to find the Godot C# assembly
+            local cwd = vim.fn.getcwd()
+            local debug_dir = cwd .. "/.godot/mono/temp/bin/Debug"
+            local assemblies = vim.fn.glob(debug_dir .. "/*.dll", false, true)
+            if #assemblies > 0 then
+              return assemblies[1]
+            end
+            return vim.fn.input("Path to dll: ", cwd .. "/", "file")
+          end,
+          cwd = "${workspaceFolder}",
+        },
+        {
+          type = "coreclr",
+          request = "attach",
+          name = "Attach to Godot",
+          processId = require("dap.utils").pick_process,
         },
       }
     end,

@@ -30,6 +30,10 @@ return {
       css = { "prettier" },
       scss = { "prettier" },
       astro = { "prettier" },
+      gdscript = { "gdformat" },
+      cs = { "csharpier" },
+      cpp = { "clang_format" },
+      c = { "clang_format" },
     },
     format_on_save = function()
       if vim.g.autoformat == false then
