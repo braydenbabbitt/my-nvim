@@ -111,6 +111,7 @@ local servers = {
   "eslint",
   -- "denols", -- Disabled by default, use <leader>lt to toggle between vtsls and denols
   "tailwindcss",
+  "gopls", -- Go with monorepo/go.work support
   "basedpyright",
   "postgres_lsp", -- Note: not available via mason, install manually
   "gdscript", -- Godot 4.x built-in LSP (connects to running editor on port 6005)
@@ -466,6 +467,77 @@ return {
             },
           },
         },
+      }
+
+      -- Go (gopls) with monorepo/go.work support
+      vim.lsp.config.gopls = {
+        cmd = { "gopls" },
+        filetypes = { "go", "gomod", "gowork", "gotmpl" },
+        root_markers = { "go.work", "go.mod", ".git" },
+        capabilities = capabilities,
+        settings = {
+          gopls = {
+            -- Monorepo: expand the workspace to include all modules in go.work
+            expandWorkspaceToModule = true,
+            -- Analyses to run
+            analyses = {
+              unusedparams = true,
+              shadow = true,
+              unusedwrite = true,
+              useany = true,
+              nilness = true,
+            },
+            -- Enable all inlay hints
+            hints = {
+              assignVariableTypes = true,
+              compositeLiteralFields = true,
+              compositeLiteralTypes = true,
+              constantValues = true,
+              functionTypeParameters = true,
+              parameterNames = true,
+              rangeVariableTypes = true,
+            },
+            -- Use staticcheck for additional linting
+            staticcheck = true,
+            -- Completion settings
+            usePlaceholders = true,
+            completeUnimported = true,
+            -- Semantic tokens for better highlighting
+            semanticTokens = true,
+            -- Build flags (add tags like "integration" if needed)
+            -- buildFlags = { "-tags=integration" },
+          },
+        },
+        -- Custom root_dir: prefer go.work (monorepo) over go.mod
+        root_dir = function(bufnr, on_dir)
+          local fname = vim.api.nvim_buf_get_name(bufnr)
+          if fname == "" then
+            on_dir(nil)
+            return
+          end
+
+          -- First look for go.work (monorepo workspace root)
+          local work_markers = vim.fs.find({ "go.work" }, {
+            path = fname,
+            upward = true,
+          })
+          if #work_markers > 0 then
+            on_dir(vim.fs.dirname(work_markers[1]))
+            return
+          end
+
+          -- Fall back to go.mod (single module)
+          local mod_markers = vim.fs.find({ "go.mod" }, {
+            path = fname,
+            upward = true,
+          })
+          if #mod_markers > 0 then
+            on_dir(vim.fs.dirname(mod_markers[1]))
+            return
+          end
+
+          on_dir(nil)
+        end,
       }
 
       -- PostgreSQL
