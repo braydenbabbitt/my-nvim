@@ -54,19 +54,61 @@ vim.keymap.set("n", "<leader>lr", function()
   end
 
   local client_names = {}
+  local client_ids = {}
+  -- Collect every buffer these clients serve, not just the current one, so we
+  -- can re-attach all of them after the servers stop (stop_client kills the
+  -- server process for ALL its buffers).
+  local affected_bufs = {}
   for _, client in ipairs(clients) do
     table.insert(client_names, client.name)
+    table.insert(client_ids, client.id)
+    for attached_buf in pairs(client.attached_buffers) do
+      affected_bufs[attached_buf] = true
+    end
   end
 
   vim.notify("Restarting LSP clients for current buffer: " .. table.concat(client_names, ", "), vim.log.levels.INFO)
 
-  -- Detach clients from current buffer only (doesn't stop the server)
-  for _, client in ipairs(clients) do
-    vim.lsp.buf_detach_client(buf, client.id)
+  -- Clear stale diagnostics for the affected buffers across all namespaces
+  for affected_buf in pairs(affected_bufs) do
+    if vim.api.nvim_buf_is_valid(affected_buf) then
+      vim.diagnostic.reset(nil, affected_buf)
+    end
   end
 
-  -- Reload buffer to trigger LSP reattachment
-  vim.cmd("edit")
+  -- Stop the clients (force) so the server process actually exits
+  vim.lsp.stop_client(client_ids, true)
+
+  -- Wait for clients to fully stop, then re-trigger filetype on each affected
+  -- buffer so the vim.lsp.enable()'d configs re-attach.
+  local timer = vim.uv.new_timer()
+  local attempts = 0
+  local done = false
+  timer:start(50, 50, vim.schedule_wrap(function()
+    if done then
+      return
+    end
+    attempts = attempts + 1
+    local still_running = false
+    for _, id in ipairs(client_ids) do
+      if vim.lsp.get_client_by_id(id) then
+        still_running = true
+        break
+      end
+    end
+    if not still_running or attempts > 40 then
+      done = true
+      timer:stop()
+      timer:close()
+      for affected_buf in pairs(affected_bufs) do
+        if vim.api.nvim_buf_is_valid(affected_buf) and vim.api.nvim_buf_is_loaded(affected_buf) then
+          -- Reassigning the filetype re-fires the FileType autocmd that
+          -- vim.lsp.enable() listens on, triggering re-attach.
+          vim.bo[affected_buf].filetype = vim.bo[affected_buf].filetype
+        end
+      end
+    end
+  end))
 end, { desc = "Restart LSPs for current buffer", remap = true })
 
 vim.keymap.set("n", "<leader>Li", "<cmd>LspInfo<CR>", { desc = "LSP Info", remap = true })
