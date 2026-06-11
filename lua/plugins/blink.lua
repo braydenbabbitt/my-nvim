@@ -3,7 +3,7 @@
 
 return {
   "saghen/blink.cmp",
-  commit = "022521a",
+  commit = "78336bc",
   dependencies = "rafamadriz/friendly-snippets",
   opts = {
     keymap = {
