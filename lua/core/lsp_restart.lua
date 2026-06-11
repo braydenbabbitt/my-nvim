@@ -8,6 +8,18 @@
 
 local M = {}
 
+-- Progress bar colors: purple while working, green once complete.
+-- Re-applied on ColorScheme so they survive theme switches.
+local function set_highlights()
+  vim.api.nvim_set_hl(0, "LspRestartProgress", { fg = "#46277a" })
+  vim.api.nvim_set_hl(0, "LspRestartDone", { fg = "#3fb950" })
+end
+set_highlights()
+vim.api.nvim_create_autocmd("ColorScheme", {
+  group = vim.api.nvim_create_augroup("lsp-restart-hl", { clear = true }),
+  callback = set_highlights,
+})
+
 -- Tick interval and per-phase timeouts (in 50ms ticks)
 local TICK_MS = 50
 local STOP_TIMEOUT = 40 -- ~2s for clients to stop
@@ -25,6 +37,25 @@ local function progress_bar(fraction)
     string.rep("░", width - filled),
     math.floor(fraction * 100 + 0.5)
   )
+end
+
+-- Custom Snacks notifier render: replicates the default "compact" style but
+-- colors ONLY the leading progress bar (first `notif.bar_bytes` bytes) via an
+-- extmark, leaving the rest of the message at the default (white) Normal hl.
+local function bar_render(buf, notif, ctx)
+  local title = vim.trim(notif.icon .. " " .. (notif.title or ""))
+  if title ~= "" then
+    ctx.opts.title = { { " " .. title .. " ", ctx.hl.title } }
+    ctx.opts.title_pos = "center"
+  end
+  vim.api.nvim_buf_set_lines(buf, 0, -1, false, vim.split(notif.msg, "\n"))
+  if notif.bar_bytes and notif.bar_hl then
+    vim.api.nvim_buf_set_extmark(buf, ctx.ns, 0, 0, {
+      end_col = notif.bar_bytes,
+      hl_group = notif.bar_hl,
+      priority = 200,
+    })
+  end
 end
 
 -- Restart the LSP clients for the current buffer (and every other buffer those
@@ -57,11 +88,22 @@ function M.restart_buffer_clients()
   local total = #client_ids
 
   local function update(fraction, message, opts)
-    Snacks.notifier.notify(
-      progress_bar(fraction) .. "  " .. message,
-      (opts and opts.level) or vim.log.levels.INFO,
-      vim.tbl_extend("force", { id = notif_id, title = "LSP Restart", timeout = false }, opts or {})
-    )
+    opts = opts or {}
+    local level = opts.level or vim.log.levels.INFO
+    local bar = progress_bar(fraction)
+    local notify_opts = vim.tbl_extend("force", { id = notif_id, title = "LSP Restart", timeout = false }, opts)
+    -- Use the custom render so only the bar is colored (text stays white).
+    notify_opts.style = bar_render
+    notify_opts.bar_bytes = #bar
+    -- Color the bar: caller-supplied group, else purple while working. Leave
+    -- warnings (timeouts) uncolored so problems stand out from normal progress.
+    if level ~= vim.log.levels.WARN then
+      notify_opts.bar_hl = opts.hl_group or "LspRestartProgress"
+    end
+    notify_opts.hl_group = nil
+    -- Vertical layout: bar on its own (row 0) line, label below. Keeps the
+    -- fixed-width bar anchored at column 0 so changing text never shifts it.
+    Snacks.notifier.notify(bar .. "\n" .. message, level, notify_opts)
   end
 
   -- Track workspace-indexing progress per client via the LSP `$/progress`
@@ -230,6 +272,7 @@ function M.restart_buffer_clients()
       -- Done once past the grace window with no client actively indexing
       if not any_active and index_attempts > INDEX_GRACE then
         finish(1, string.format("Restarted %s across %d buffer%s", names, n, n == 1 and "" or "s"), {
+          hl_group = "LspRestartDone",
           icon = "",
           timeout = 2500,
         })
