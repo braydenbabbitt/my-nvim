@@ -12,6 +12,7 @@ describe("plugin commit pinning", function()
     "lsp.lua",
     "lualine.lua",
     "luasnip.lua",
+    "markdown.lua",
     "noice.lua",
     "snacks.lua",
     "telescope.lua",
