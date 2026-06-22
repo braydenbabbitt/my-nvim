@@ -57,9 +57,9 @@ return {
       cell = "padded",
     },
 
-    -- Colored quote/callout blocks (Note, Tip, Warning, etc.)
+    -- Colored quote blocks. Callouts (> [!NOTE], > [!WARNING], etc.) are
+    -- enabled by default; they are a map of definitions, not an enable flag.
     quote = { enabled = true, icon = "▋" },
-    callout = { enabled = true },
 
     -- Highlight inline code spans
     inline_highlight = { enabled = true },
