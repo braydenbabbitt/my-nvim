@@ -638,7 +638,7 @@ return {
       -- MODERN 0.11 FEATURES
       -- ===================================================================
 
-      -- Auto-fold imports on file open
+      -- Auto-fold imports on file open (toggleable via <leader>uF, default off)
       -- Configure which filetypes to exclude from auto-folding
       local auto_fold_exclude_filetypes = {
         -- Uncomment to exclude specific filetypes:
@@ -651,6 +651,11 @@ return {
       vim.api.nvim_create_autocmd("LspNotify", {
         group = vim.api.nvim_create_augroup("lsp-auto-fold-imports", { clear = true }),
         callback = function(args)
+          -- Off by default; toggled via vim.g.autofold_imports (see snacks.lua)
+          if not vim.g.autofold_imports then
+            return
+          end
+
           if args.data.method == "textDocument/didOpen" then
             local bufnr = args.buf
             local ft = vim.bo[bufnr].filetype

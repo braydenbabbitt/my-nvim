@@ -261,6 +261,22 @@ return {
             vim.g.autoformat = state
           end,
         }):map("<leader>uf")
+        Snacks.toggle.new({
+          name = "Auto-fold Imports",
+          get = function()
+            return vim.g.autofold_imports == true
+          end,
+          set = function(state)
+            vim.g.autofold_imports = state
+            -- Apply immediately to the current window so the toggle has effect
+            local winid = vim.api.nvim_get_current_win()
+            if state then
+              vim.lsp.foldclose("imports", winid)
+            else
+              vim.lsp.foldopen("imports", winid)
+            end
+          end,
+        }):map("<leader>uF")
       end,
     })
   end,
