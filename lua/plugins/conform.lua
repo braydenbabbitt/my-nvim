@@ -2,54 +2,73 @@
 -- Handles code formatting with external formatters
 
 return {
-  "stevearc/conform.nvim",
-  commit = "b4aab98",
-  event = { "BufWritePre" },
-  cmd = { "ConformInfo" },
-  keys = {
-    {
-      "<leader>cf",
-      function()
-        require("conform").format({ async = true, lsp_fallback = true })
-      end,
-      mode = "",
-      desc = "Format buffer",
-    },
-  },
-  opts = {
-    formatters_by_ft = {
-      lua = { "stylua" },
-      javascript = { "prettier" },
-      typescript = { "prettier" },
-      javascriptreact = { "prettier" },
-      typescriptreact = { "prettier" },
-      json = { "prettier" },
-      yaml = { "prettier" },
-      markdown = { "prettier" },
-      html = { "prettier" },
-      css = { "prettier" },
-      scss = { "prettier" },
-      astro = { "prettier" },
-      gdscript = { "gdformat" },
-      cs = { "csharpier" },
-      cpp = { "clang_format" },
-      c = { "clang_format" },
-    },
-    format_on_save = function()
-      if vim.g.autoformat == false then
-        return nil
-      end
-      return { timeout_ms = 500, lsp_fallback = true }
-    end,
-    -- Set up formatters
-    formatters = {
-      prettier = {
-        prepend_args = { "--prose-wrap", "always" },
+  -- Mason-tool-installer - auto-installs Mason-managed formatters/linters
+  -- (mason-lspconfig only covers LSP servers, not formatters like sqlfluff)
+  {
+    "WhoIsSethDaniel/mason-tool-installer.nvim",
+    commit = "443f1ef",
+    dependencies = { "williamboman/mason.nvim" },
+    opts = {
+      ensure_installed = {
+        "sqlfluff", -- SQL formatter/linter (postgres dialect, see conform config below)
       },
     },
   },
-  init = function()
-    -- If you want conform to format on save, you can do it here
-    vim.o.formatexpr = "v:lua.require'conform'.formatexpr()"
-  end,
+
+  {
+    "stevearc/conform.nvim",
+    commit = "b4aab98",
+    event = { "BufWritePre" },
+    cmd = { "ConformInfo" },
+    keys = {
+      {
+        "<leader>cf",
+        function()
+          require("conform").format({ async = true, lsp_fallback = true })
+        end,
+        mode = "",
+        desc = "Format buffer",
+      },
+    },
+    opts = {
+      formatters_by_ft = {
+        lua = { "stylua" },
+        javascript = { "prettier" },
+        typescript = { "prettier" },
+        javascriptreact = { "prettier" },
+        typescriptreact = { "prettier" },
+        json = { "prettier" },
+        yaml = { "prettier" },
+        markdown = { "prettier" },
+        html = { "prettier" },
+        css = { "prettier" },
+        scss = { "prettier" },
+        astro = { "prettier" },
+        sql = { "sqlfluff" },
+        gdscript = { "gdformat" },
+        cs = { "csharpier" },
+        cpp = { "clang_format" },
+        c = { "clang_format" },
+      },
+      format_on_save = function()
+        if vim.g.autoformat == false then
+          return nil
+        end
+        return { timeout_ms = 500, lsp_fallback = true }
+      end,
+      -- Set up formatters
+      formatters = {
+        prettier = {
+          prepend_args = { "--prose-wrap", "always" },
+        },
+        sqlfluff = {
+          args = { "format", "--dialect", "postgres", "-" },
+        },
+      },
+    },
+    init = function()
+      -- If you want conform to format on save, you can do it here
+      vim.o.formatexpr = "v:lua.require'conform'.formatexpr()"
+    end,
+  },
 }
